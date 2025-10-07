@@ -132,7 +132,7 @@ Fügen Sie den Plesk MCP Server zur Konfiguration hinzu:
   "mcpServers": {
     "plesk": {
       "command": "node",
-      "args": ["D:/git/plesk_mcp/dist/index.js"]
+      "args": ["/home/user/plesk-mcp-server/dist/index.js"]
     }
   }
 }
