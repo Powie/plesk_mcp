@@ -1,0 +1,33 @@
+{
+  "name": "plesk-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP Server for Plesk REST API - supports multiple Plesk instances",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "plesk-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "start": "node dist/index.js",
+    "dev": "tsc && node dist/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "plesk",
+    "model-context-protocol",
+    "hosting"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "axios": "^1.7.2",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "typescript": "^5.5.3"
+  }
+}
