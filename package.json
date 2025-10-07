@@ -1,6 +1,6 @@
 {
   "name": "plesk-mcp-server",
-  "version": "1.0.0",
+  "version": "0.9.0",
   "description": "MCP Server for Plesk REST API - supports multiple Plesk instances",
   "type": "module",
   "main": "dist/index.js",
@@ -20,8 +20,8 @@
     "model-context-protocol",
     "hosting"
   ],
-  "author": "",
-  "license": "MIT",
+  "author": "Powie",
+  "license": "GPL3",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "axios": "^1.7.2",
