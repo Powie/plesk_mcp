@@ -11,24 +11,39 @@ Diese Anleitung beschreibt, wie Sie den Plesk MCP Server für die Nutzung mit Cl
 
 ## Installation
 
-### 1. Repository klonen oder herunterladen
+### Option A: Installation von GitHub (Empfohlen)
+
+Die einfachste Methode ist die direkte Installation von GitHub:
 
 ```bash
-git clone <repository-url>
+npm install github:Powie/plesk_mcp
+```
+
+Das Projekt wird automatisch heruntergeladen, die Dependencies installiert und TypeScript kompiliert.
+
+**Hinweis:** Sie können auch einen spezifischen Branch installieren:
+```bash
+npm install github:Powie/plesk_mcp#beta
+```
+
+### Option B: Lokale Installation (Entwicklung)
+
+Für Entwicklungszwecke oder wenn Sie den Code anpassen möchten:
+
+#### 1. Repository klonen
+
+```bash
+git clone https://github.com/Powie/plesk_mcp.git
 cd plesk_mcp
 ```
 
-### 2. Dependencies installieren
+#### 2. Dependencies installieren und kompilieren
 
 ```bash
 npm install
 ```
 
-### 3. TypeScript kompilieren
-
-```bash
-npm run build
-```
+Der `prepare`-Script wird automatisch ausgeführt und kompiliert TypeScript mit `npm run build`.
 
 ## Konfiguration
 
@@ -96,6 +111,21 @@ Die Konfigurationsdatei finden Sie hier:
 ### 2. MCP Server hinzufügen
 
 Fügen Sie den Plesk MCP Server zur Konfiguration hinzu:
+
+#### Bei Installation von GitHub:
+
+```json
+{
+  "mcpServers": {
+    "plesk": {
+      "command": "node",
+      "args": ["./node_modules/plesk-mcp-server/dist/index.js"]
+    }
+  }
+}
+```
+
+#### Bei lokaler Installation (Entwicklung):
 
 ```json
 {
