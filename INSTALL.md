@@ -1,131 +1,134 @@
-# Installation des Plesk MCP Servers
+# Plesk MCP Server Installation
 
-Diese Anleitung beschreibt, wie Sie den Plesk MCP Server für die Nutzung mit Claude Desktop oder anderen MCP-Clients installieren und konfigurieren.
+This guide describes how to install and configure the Plesk MCP Server for use with Claude Desktop or other MCP clients.
 
-## Voraussetzungen
+## Prerequisites
 
-- Node.js (Version 18 oder höher)
-- npm oder yarn
-- Zugang zu einem oder mehreren Plesk-Servern
-- Claude Desktop (für die Nutzung mit Claude)
+- Node.js (version 18 or higher)
+- npm or yarn
+- Access to one or more Plesk servers
+- Claude Desktop (for use with Claude)
 
 ## Installation
 
-### Option A: Installation von GitHub (Empfohlen)
+### Option A: Installation from GitHub (Recommended)
 
-Die einfachste Methode ist die direkte Installation von GitHub:
+The easiest method is direct installation from GitHub:
 
 ```bash
 npm install github:Powie/plesk_mcp
 ```
 
-Das Projekt wird automatisch heruntergeladen, die Dependencies installiert und TypeScript kompiliert.
+The project will be automatically downloaded, dependencies installed, and TypeScript compiled.
 
-**Hinweis:** Sie können auch einen spezifischen Branch installieren:
+**Note:** You can also install a specific branch:
 ```bash
 npm install github:Powie/plesk_mcp#beta
 ```
 
-### Option B: Lokale Installation (Entwicklung)
+### Option B: Local Installation (Development)
 
-Für Entwicklungszwecke oder wenn Sie den Code anpassen möchten:
+For development purposes or if you want to customize the code:
 
-#### 1. Repository klonen
+#### 1. Clone repository
 
 ```bash
 git clone https://github.com/Powie/plesk_mcp.git
 cd plesk_mcp
 ```
 
-#### 2. Dependencies installieren und kompilieren
+#### 2. Install dependencies and compile
 
 ```bash
 npm install
 ```
 
-Der `prepare`-Script wird automatisch ausgeführt und kompiliert TypeScript mit `npm run build`.
+The `prepare` script will automatically run and compile TypeScript with `npm run build`.
 
-## Konfiguration
+## Configuration
 
-### 1. Umgebungsvariablen einrichten
+### 1. Set up environment variables
 
-Kopieren Sie die Beispiel-Konfiguration:
+Copy the example configuration:
 
 ```bash
 cp .env.example .env
 ```
 
-Bearbeiten Sie die `.env` Datei und tragen Sie Ihre Plesk-Zugangsdaten ein:
+Edit the `.env` file and enter your Plesk credentials:
 
 ```env
-# Erste Plesk-Instanz (Standard)
+# First Plesk instance (default)
 PLESK_URL=https://your-plesk-server.com:8443
 PLESK_API_KEY=your-api-key-here
 
-# Zweite Plesk-Instanz (optional)
+# Second Plesk instance (optional)
 PLESK_2_URL=https://second-server.com:8443
 PLESK_2_API_KEY=second-api-key-here
 
-# Weitere Instanzen nach dem gleichen Schema
+# Additional instances following the same pattern
 # PLESK_3_URL=...
 # PLESK_3_API_KEY=...
 ```
 
-### 2. API-Key erhalten
+### 2. Obtaining an API Key
 
-Sie haben mehrere Möglichkeiten, einen API-Key zu erhalten:
+You have several options to obtain an API key:
 
-#### Option A: Automatisch über den MCP Server (Empfohlen)
+#### Option A: Automatically via MCP Server (Recommended)
 
-Nach der Integration in Claude Desktop können Sie den API-Key automatisch generieren lassen:
+After integrating with Claude Desktop, you can have the API key generated automatically:
 
-1. Starten Sie Claude Desktop
-2. Nutzen Sie das Tool `plesk_generate_api_key`
-3. Der Key wird automatisch in die `.env` Datei geschrieben
-4. Starten Sie Claude Desktop neu, um den neuen Key zu laden
+1. Start Claude Desktop
+2. Use the `plesk_generate_api_key` tool
+3. The key will be automatically written to the `.env` file
+4. Restart Claude Desktop to load the new key
 
-#### Option B: Manuell über Plesk UI
+#### Option B: Manually via Plesk UI
 
-1. Melden Sie sich in Plesk an
-2. Navigieren Sie zu: **Tools & Settings** → **API Keys**
-3. Klicken Sie auf **Create API Key**
-4. Kopieren Sie den generierten Key
-5. Fügen Sie ihn in Ihre `.env` Datei ein
+1. Log in to Plesk
+2. Navigate to: **Tools & Settings** → **API Keys**
+3. Click on **Create API Key**
+4. Copy the generated key
+5. Add it to your `.env` file
 
-#### Option C: Über die Plesk CLI
+#### Option C: Via Plesk CLI
 
 ```bash
 plesk ext call api-management --method create --params "name=MyAPIKey"
 ```
 
-## Integration mit Claude Desktop
+## Integration with Claude Desktop
 
-### 1. Claude Desktop Config öffnen
+### 1. Open Claude Desktop Config
 
-Die Konfigurationsdatei finden Sie hier:
+The configuration file can be found here:
 
 - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 - **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Linux:** `~/.config/Claude/claude_desktop_config.json`
 
-### 2. MCP Server hinzufügen
+### 2. Add MCP Server
 
-Fügen Sie den Plesk MCP Server zur Konfiguration hinzu:
+Add the Plesk MCP Server to the configuration:
 
-#### Bei Installation von GitHub:
+#### For GitHub installation:
 
 ```json
 {
   "mcpServers": {
-    "plesk": {
-      "command": "node",
-      "args": ["./node_modules/plesk-mcp-server/dist/index.js"]
-    }
+   "plesk": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "github:Powie/plesk_mcp#beta"
+      ]
+   }
   }
 }
 ```
 
-#### Bei lokaler Installation (Entwicklung):
+#### For local installation (development):
 
 ```json
 {
@@ -138,120 +141,124 @@ Fügen Sie den Plesk MCP Server zur Konfiguration hinzu:
 }
 ```
 
-**Wichtig:** Passen Sie den Pfad an Ihre Installation an!
+**Important:** Adjust the path to match your installation!
 
-Für Linux/macOS verwenden Sie Forward-Slashes:
+For Linux/macOS use forward slashes:
 ```json
 "args": ["/home/user/plesk_mcp/dist/index.js"]
 ```
 
-### 3. Claude Desktop neu starten
+### 3. Restart Claude Desktop
 
-Starten Sie Claude Desktop komplett neu, damit die Änderungen wirksam werden.
+Completely restart Claude Desktop for the changes to take effect.
 
-### 4. Verbindung testen
+Add the first server with this prompt:
 
-Öffnen Sie Claude Desktop und testen Sie die Verbindung:
+Add a new Plesk server, server name: https://server.xx:8443 with username: user and password: secretpassword
+
+### 4. Test connection
+
+Open Claude Desktop and test the connection:
 
 ```
-Zeige mir alle verfügbaren Plesk-Instanzen
+Show me all available Plesk instances
 ```
 
-Claude sollte nun die konfigurierten Plesk-Server anzeigen.
+Claude should now display the configured Plesk servers.
 
-## Verfügbare MCP Tools
+## Available MCP Tools
 
-Nach der Installation stehen Ihnen folgende Tools zur Verfügung:
+After installation, the following tools are available:
 
-### Server & Instanzen
-- `plesk_list_instances` - Zeigt alle konfigurierten Plesk-Instanzen
-- `plesk_get_server_info` - Server-Informationen abrufen
-- `plesk_list_ips` - Alle IP-Adressen auflisten
+### Server & Instances
+- `plesk_list_instances` - Show all configured Plesk instances
+- `plesk_get_server_info` - Retrieve server information
+- `plesk_list_ips` - List all IP addresses
 
-### API-Key Management
-- `plesk_generate_api_key` - Neuen API-Key generieren und speichern
-- `plesk_list_api_keys` - Alle API-Keys auflisten
-- `plesk_delete_api_key` - API-Key löschen
+### API Key Management
+- `plesk_generate_api_key` - Generate and save new API key
+- `plesk_list_api_keys` - List all API keys
+- `plesk_delete_api_key` - Delete API key
 
 ### Domain Management
-- `plesk_list_domains` - Alle Domains auflisten
-- `plesk_get_domain` - Domain-Details abrufen
-- `plesk_create_domain` - Neue Domain erstellen
-- `plesk_update_domain` - Domain aktualisieren
-- `plesk_delete_domain` - Domain löschen
+- `plesk_list_domains` - List all domains
+- `plesk_get_domain` - Retrieve domain details
+- `plesk_create_domain` - Create new domain
+- `plesk_update_domain` - Update domain
+- `plesk_delete_domain` - Delete domain
 
 ### Client Management
-- `plesk_list_clients` - Alle Clients auflisten
-- `plesk_get_client` - Client-Details abrufen
-- `plesk_create_client` - Neuen Client erstellen
-- `plesk_update_client` - Client aktualisieren
-- `plesk_suspend_client` - Client suspendieren
-- `plesk_activate_client` - Client aktivieren
+- `plesk_list_clients` - List all clients
+- `plesk_get_client` - Retrieve client details
+- `plesk_create_client` - Create new client
+- `plesk_update_client` - Update client
+- `plesk_suspend_client` - Suspend client
+- `plesk_activate_client` - Activate client
 
 ### Extensions & CLI
-- `plesk_list_extensions` - Installierte Extensions auflisten
-- `plesk_execute_cli` - Plesk CLI-Befehl ausführen
+- `plesk_list_extensions` - List installed extensions
+- `plesk_execute_cli` - Execute Plesk CLI command
 
 ### WordPress Toolkit
-- `plesk_wp_list_installations` - Alle WordPress-Installationen auflisten
-- `plesk_wp_get_installation` - Details einer WordPress-Installation abrufen
-- `plesk_wp_clone_installation` - WordPress-Installation klonen
-- `plesk_wp_create_backup` - Backup einer WordPress-Installation erstellen
-- `plesk_wp_restore_backup` - WordPress-Installation aus Backup wiederherstellen
-- `plesk_wp_list_backups` - Alle Backups für eine Installation auflisten
-- `plesk_wp_toggle_maintenance` - Wartungsmodus aktivieren/deaktivieren
-- `plesk_wp_clear_cache` - Cache für WordPress-Installationen leeren
-- `plesk_wp_get_background_task` - Status eines Background-Tasks abrufen
-- `plesk_wp_list_background_tasks` - Alle Background-Tasks für eine Installation
-- `plesk_wp_update_vulnerability_filtering` - Sicherheitsfilter aktivieren/deaktivieren
-- `plesk_wp_get_changelog` - WordPress Toolkit Changelog abrufen
+- `plesk_wp_list_installations` - List all WordPress installations
+- `plesk_wp_get_installation` - Retrieve WordPress installation details
+- `plesk_wp_clone_installation` - Clone WordPress installation
+- `plesk_wp_create_backup` - Create backup of WordPress installation
+- `plesk_wp_restore_backup` - Restore WordPress installation from backup
+- `plesk_wp_list_backups` - List all backups for an installation
+- `plesk_wp_toggle_maintenance` - Enable/disable maintenance mode
+- `plesk_wp_clear_cache` - Clear cache for WordPress installations
+- `plesk_wp_get_background_task` - Retrieve background task status
+- `plesk_wp_list_background_tasks` - List all background tasks for an installation
+- `plesk_wp_update_vulnerability_filtering` - Enable/disable security filtering
+- `plesk_wp_get_changelog` - Retrieve WordPress Toolkit changelog
 
-## Verwendungsbeispiele
+## Usage Examples
 
-### Domains auflisten
+### List domains
 ```
-Zeige mir alle Domains auf meinem Plesk-Server
-```
-
-### Domain erstellen
-```
-Erstelle eine neue Domain "example.com" für den Client mit ID 5
+Show me all domains on my Plesk server
 ```
 
-### Server-Informationen abrufen
+### Create domain
 ```
-Welche Plesk-Version läuft auf meinem Server?
-```
-
-### API-Key generieren
-```
-Generiere einen neuen API-Key für meinen Plesk-Server unter https://server.com:8443 mit Benutzername admin und Passwort xyz
+Create a new domain "example.com" for client with ID 5
 ```
 
-### WordPress-Installationen verwalten
+### Retrieve server information
 ```
-Zeige mir alle WordPress-Installationen auf meinem Server
+Which Plesk version is running on my server?
 ```
 
+### Generate API key
 ```
-Erstelle ein Backup der WordPress-Installation mit ID 15
+Generate a new API key for my Plesk server at https://server.com:8443 with username admin and password xyz
+```
+
+### Manage WordPress installations
+```
+Show me all WordPress installations on my server
 ```
 
 ```
-Aktiviere den Wartungsmodus für die WordPress-Installation mit ID 15
+Create a backup of WordPress installation with ID 15
 ```
 
 ```
-Klone die WordPress-Installation mit ID 15 nach staging.example.com
+Enable maintenance mode for WordPress installation with ID 15
 ```
 
 ```
-Lösche den Cache für die WordPress-Installationen 10, 15 und 20
+Clone WordPress installation with ID 15 to staging.example.com
 ```
 
-## Mehrere Plesk-Instanzen
+```
+Clear cache for WordPress installations 10, 15 and 20
+```
 
-Der MCP Server unterstützt mehrere Plesk-Instanzen gleichzeitig. Fügen Sie einfach weitere Instanzen in der `.env` Datei hinzu:
+## Multiple Plesk Instances
+
+The MCP Server supports multiple Plesk instances simultaneously. Simply add more instances in the `.env` file:
 
 ```env
 PLESK_URL=https://server1.com:8443
@@ -264,34 +271,34 @@ PLESK_3_URL=https://server3.com:8443
 PLESK_3_API_KEY=key3
 ```
 
-Beim Aufruf der Tools können Sie dann die gewünschte Instanz angeben.
+When calling the tools, you can then specify the desired instance.
 
 ## Troubleshooting
 
-### MCP Server wird nicht erkannt
+### MCP Server not recognized
 
-1. Überprüfen Sie den Pfad in `claude_desktop_config.json`
-2. Stellen Sie sicher, dass `npm run build` erfolgreich ausgeführt wurde
-3. Prüfen Sie, ob die Datei `dist/index.js` existiert
-4. Starten Sie Claude Desktop komplett neu (nicht nur das Fenster schließen)
+1. Check the path in `claude_desktop_config.json`
+2. Ensure that `npm run build` was executed successfully
+3. Check if the file `dist/index.js` exists
+4. Completely restart Claude Desktop (not just close the window)
 
-### Verbindungsfehler zu Plesk
+### Connection errors to Plesk
 
-1. Überprüfen Sie die URL in der `.env` Datei (inkl. Port 8443)
-2. Testen Sie die Verbindung im Browser
-3. Prüfen Sie, ob der API-Key noch gültig ist
-4. Stellen Sie sicher, dass der Plesk-Server von Ihrem Netzwerk aus erreichbar ist
+1. Check the URL in the `.env` file (including port 8443)
+2. Test the connection in your browser
+3. Check if the API key is still valid
+4. Ensure that the Plesk server is reachable from your network
 
-### API-Key funktioniert nicht
+### API key not working
 
-1. Generieren Sie einen neuen API-Key über die Plesk UI
-2. Stellen Sie sicher, dass keine zusätzlichen Leerzeichen im Key sind
-3. Prüfen Sie, ob der Key die richtigen Berechtigungen hat
-4. Starten Sie Claude Desktop nach Änderungen an der `.env` Datei neu
+1. Generate a new API key via the Plesk UI
+2. Ensure there are no extra spaces in the key
+3. Check if the key has the correct permissions
+4. Restart Claude Desktop after changes to the `.env` file
 
 ## Updates
 
-Um den MCP Server zu aktualisieren:
+To update the MCP Server:
 
 ```bash
 git pull
@@ -299,17 +306,17 @@ npm install
 npm run build
 ```
 
-Starten Sie danach Claude Desktop neu.
+Then restart Claude Desktop.
 
-## Deinstallation
+## Uninstallation
 
-1. Entfernen Sie den Eintrag aus `claude_desktop_config.json`
-2. Starten Sie Claude Desktop neu
-3. Löschen Sie optional das `plesk_mcp` Verzeichnis
+1. Remove the entry from `claude_desktop_config.json`
+2. Restart Claude Desktop
+3. Optionally delete the `plesk_mcp` directory
 
 ## Support
 
-Bei Problemen oder Fragen:
-- Überprüfen Sie die Logs von Claude Desktop
-- Testen Sie die Plesk API direkt mit curl/Postman
-- Öffnen Sie ein Issue im Repository
+For problems or questions:
+- Check the Claude Desktop logs
+- Test the Plesk API directly with curl/Postman
+- Open an issue in the repository

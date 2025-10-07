@@ -1,24 +1,24 @@
 # Plesk MCP Server
 
-MCP Server für die Plesk REST API mit Unterstützung für mehrere Plesk-Instanzen.
+MCP Server for the Plesk REST API with support for multiple Plesk instances.
 
 ## Features
 
-- ✅ Support für mehrere Plesk-Instanzen
-- ✅ Automatische API-Key-Generierung
-- ✅ Vollständige REST API Integration
-- ✅ Domain-Management
-- ✅ Client-Management
-- ✅ Server-Informationen
-- ✅ Extension-Management
-- ✅ CLI-Befehle ausführen
+- ✅ Support for multiple Plesk instances
+- ✅ Automatic API key generation
+- ✅ Complete REST API integration
+- ✅ Domain management
+- ✅ Client management
+- ✅ Server information
+- ✅ Extension management
+- ✅ Execute CLI commands
 - ✅ **WordPress Toolkit Integration**
-  - WordPress Installationen verwalten
-  - Backups erstellen und wiederherstellen
-  - Installationen klonen
-  - Wartungsmodus steuern
-  - Cache leeren
-  - Sicherheitseinstellungen (Vulnerability Filtering)
+  - Manage WordPress installations
+  - Create and restore backups
+  - Clone installations
+  - Control maintenance mode
+  - Clear cache
+  - Security settings (Vulnerability Filtering)
 
 ## Installation
 
@@ -27,10 +27,10 @@ npm install
 npm run build
 ```
 
-## Konfiguration
+## Configuration
 
-1. Kopiere `.env.example` zu `.env`
-2. Trage deine Plesk-Instanzen ein:
+1. Copy `.env.example` to `.env`
+2. Enter your Plesk instances:
 
 ```env
 PLESK_URL=https://your-plesk-server.com
@@ -40,93 +40,93 @@ PLESK_2_URL=https://second-server.com
 PLESK_2_API_KEY=second-api-key
 ```
 
-## API-Key generieren
+## Generate API Key
 
-### Automatisch über MCP Tool (empfohlen)
+### Automatically via MCP Tool (recommended)
 
-Der MCP Server bietet ein Tool zur automatischen API-Key-Generierung:
+The MCP Server provides a tool for automatic API key generation:
 
 **In Claude Desktop:**
 ```
-Verwende das Tool plesk_generate_api_key mit:
-- plesk_url: https://dein-server.com:8443
+Use the plesk_generate_api_key tool with:
+- plesk_url: https://your-server.com:8443
 - username: admin
-- password: dein-passwort
-- instance_name: default (oder instance_2, etc.)
+- password: your-password
+- instance_name: default (or instance_2, etc.)
 ```
 
-Das Tool generiert automatisch einen API-Key und speichert ihn in der `.env` Datei. Nach einem Neustart des MCP Servers ist die Instanz verfügbar.
+The tool automatically generates an API key and saves it in the `.env` file. After restarting the MCP Server, the instance is available.
 
-### Manuell über Plesk UI
+### Manually via Plesk UI
 
-1. Melde dich in Plesk an
-2. Gehe zu "Tools & Settings" > "API Keys"
-3. Erstelle einen neuen API-Key
-4. Kopiere den Key in deine `.env` Datei
+1. Log in to Plesk
+2. Go to "Tools & Settings" > "API Keys"
+3. Create a new API key
+4. Copy the key to your `.env` file
 
 ## MCP Tools
 
 ### Authentication & Setup
-- `plesk_generate_api_key` - API-Key generieren und in .env speichern
-- `plesk_list_api_keys` - Alle API-Keys auflisten
-- `plesk_delete_api_key` - API-Key löschen
-- `plesk_list_instances` - Alle konfigurierten Instanzen anzeigen
+- `plesk_generate_api_key` - Generate API key and save to .env
+- `plesk_list_api_keys` - List all API keys
+- `plesk_delete_api_key` - Delete API key
+- `plesk_list_instances` - Show all configured instances
 
 ### Domain Management
-- `plesk_list_domains` - Liste aller Domains
-- `plesk_get_domain` - Domain-Details abrufen
-- `plesk_create_domain` - Neue Domain erstellen
-- `plesk_update_domain` - Domain aktualisieren
-- `plesk_delete_domain` - Domain löschen
+- `plesk_list_domains` - List all domains
+- `plesk_get_domain` - Retrieve domain details
+- `plesk_create_domain` - Create new domain
+- `plesk_update_domain` - Update domain
+- `plesk_delete_domain` - Delete domain
 
 ### Client Management
-- `plesk_list_clients` - Liste aller Clients
-- `plesk_get_client` - Client-Details abrufen
-- `plesk_create_client` - Neuen Client erstellen
-- `plesk_update_client` - Client aktualisieren
-- `plesk_suspend_client` - Client suspendieren
-- `plesk_activate_client` - Client aktivieren
+- `plesk_list_clients` - List all clients
+- `plesk_get_client` - Retrieve client details
+- `plesk_create_client` - Create new client
+- `plesk_update_client` - Update client
+- `plesk_suspend_client` - Suspend client
+- `plesk_activate_client` - Activate client
 
 ### Server Management
-- `plesk_get_server_info` - Server-Informationen
-- `plesk_list_ips` - Liste aller IP-Adressen
+- `plesk_get_server_info` - Server information
+- `plesk_list_ips` - List all IP addresses
 
 ### Extensions
-- `plesk_list_extensions` - Liste aller Extensions
+- `plesk_list_extensions` - List all extensions
 
 ### CLI
-- `plesk_execute_cli` - Plesk CLI-Befehl ausführen
+- `plesk_execute_cli` - Execute Plesk CLI command
 
 ### WordPress Toolkit
-- `plesk_wp_list_installations` - Liste aller WordPress-Installationen
-- `plesk_wp_get_installation` - Details einer WordPress-Installation
-- `plesk_wp_clone_installation` - WordPress-Installation klonen
-- `plesk_wp_create_backup` - Backup erstellen
-- `plesk_wp_restore_backup` - Backup wiederherstellen
-- `plesk_wp_list_backups` - Alle Backups auflisten
-- `plesk_wp_toggle_maintenance` - Wartungsmodus aktivieren/deaktivieren
-- `plesk_wp_clear_cache` - Cache leeren
-- `plesk_wp_get_background_task` - Status eines Background-Tasks abrufen
-- `plesk_wp_list_background_tasks` - Background-Tasks auflisten
-- `plesk_wp_update_vulnerability_filtering` - Vulnerability-Filtering aktivieren/deaktivieren
-- `plesk_wp_get_changelog` - WordPress Toolkit Changelog abrufen
+- `plesk_wp_list_installations` - List all WordPress installations
+- `plesk_wp_get_installation` - WordPress installation details
+- `plesk_wp_clone_installation` - Clone WordPress installation
+- `plesk_wp_create_backup` - Create backup
+- `plesk_wp_restore_backup` - Restore backup
+- `plesk_wp_list_backups` - List all backups
+- `plesk_wp_toggle_maintenance` - Enable/disable maintenance mode
+- `plesk_wp_clear_cache` - Clear cache
+- `plesk_wp_get_background_task` - Retrieve background task status
+- `plesk_wp_list_background_tasks` - List background tasks
+- `plesk_wp_update_vulnerability_filtering` - Enable/disable vulnerability filtering
+- `plesk_wp_get_changelog` - Retrieve WordPress Toolkit changelog
 
-## Verwendung mit Claude Desktop
+## Usage with Claude Desktop
 
-Füge in der Claude Desktop Config (`claude_desktop_config.json`) hinzu:
+Add to Claude Desktop Config (`claude_desktop_config.json`):
 
 ```json
 {
   "mcpServers": {
     "plesk": {
       "command": "node",
-      "args": ["D:/git/plesk_mcp/dist/index.js"]
+      "args": ["/yourgit/plesk_mcp/dist/index.js"]
     }
   }
 }
 ```
 
-## Entwicklung
+## Development
 
 ```bash
 npm run dev
