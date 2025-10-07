@@ -73,18 +73,7 @@ PLESK_2_API_KEY=second-api-key-here
 
 ### 2. API-Key erhalten
 
-Sie haben mehrere Möglichkeiten, einen API-Key zu erhalten:
-
-#### Option A: Automatisch über den MCP Server (Empfohlen)
-
-Nach der Integration in Claude Desktop können Sie den API-Key automatisch generieren lassen:
-
-1. Starten Sie Claude Desktop
-2. Nutzen Sie das Tool `plesk_generate_api_key`
-3. Der Key wird automatisch in die `.env` Datei geschrieben
-4. Starten Sie Claude Desktop neu, um den neuen Key zu laden
-
-#### Option B: Manuell über Plesk UI
+#### Option A: Manuell über Plesk UI
 
 1. Melden Sie sich in Plesk an
 2. Navigieren Sie zu: **Tools & Settings** → **API Keys**
@@ -92,11 +81,10 @@ Nach der Integration in Claude Desktop können Sie den API-Key automatisch gener
 4. Kopieren Sie den generierten Key
 5. Fügen Sie ihn in Ihre `.env` Datei ein
 
-#### Option C: Über die Plesk CLI
+#### Option B: Über Plesk Extension
 
-```bash
-plesk ext call api-management --method create --params "name=MyAPIKey"
-```
+1. Installieren Sie die Plesk Extension "secret-keys-manager"
+2. Öffnen Sie die Extension und fügen Sie einen neuen API Key hinzu
 
 ## Integration mit Claude Desktop
 
@@ -112,7 +100,7 @@ Die Konfigurationsdatei finden Sie hier:
 
 Fügen Sie den Plesk MCP Server zur Konfiguration hinzu:
 
-#### Bei Installation von GitHub:
+#### Empfohlen: Bei Installation von GitHub:
 
 ```json
 {
@@ -122,30 +110,14 @@ Fügen Sie den Plesk MCP Server zur Konfiguration hinzu:
       "args": [
         "-y",
         "github:Powie/plesk_mcp#beta"
-      ]
+      ],
+      "env": {
+        "PLESK_1_URL": "https://my.server1.com:8443",
+        "PLESK_1_API_KEY": "total-secret-key"
+      }
    }
   }
 }
-```
-
-#### Bei lokaler Installation (Entwicklung):
-
-```json
-{
-  "mcpServers": {
-    "plesk": {
-      "command": "node",
-      "args": ["/home/user/plesk-mcp-server/dist/index.js"]
-    }
-  }
-}
-```
-
-**Wichtig:** Passen Sie den Pfad an Ihre Installation an!
-
-Für Linux/macOS verwenden Sie Forward-Slashes:
-```json
-"args": ["/home/user/plesk_mcp/dist/index.js"]
 ```
 
 ### 3. Claude Desktop neu starten
@@ -166,95 +138,6 @@ Zeige mir alle verfügbaren Plesk-Instanzen
 
 Claude sollte nun die konfigurierten Plesk-Server anzeigen.
 
-## Verfügbare MCP Tools
-
-Nach der Installation stehen Ihnen folgende Tools zur Verfügung:
-
-### Server & Instanzen
-- `plesk_list_instances` - Zeigt alle konfigurierten Plesk-Instanzen
-- `plesk_get_server_info` - Server-Informationen abrufen
-- `plesk_list_ips` - Alle IP-Adressen auflisten
-
-### API-Key Management
-- `plesk_generate_api_key` - Neuen API-Key generieren und speichern
-- `plesk_list_api_keys` - Alle API-Keys auflisten
-- `plesk_delete_api_key` - API-Key löschen
-
-### Domain Management
-- `plesk_list_domains` - Alle Domains auflisten
-- `plesk_get_domain` - Domain-Details abrufen
-- `plesk_create_domain` - Neue Domain erstellen
-- `plesk_update_domain` - Domain aktualisieren
-- `plesk_delete_domain` - Domain löschen
-
-### Client Management
-- `plesk_list_clients` - Alle Clients auflisten
-- `plesk_get_client` - Client-Details abrufen
-- `plesk_create_client` - Neuen Client erstellen
-- `plesk_update_client` - Client aktualisieren
-- `plesk_suspend_client` - Client suspendieren
-- `plesk_activate_client` - Client aktivieren
-
-### Extensions & CLI
-- `plesk_list_extensions` - Installierte Extensions auflisten
-- `plesk_execute_cli` - Plesk CLI-Befehl ausführen
-
-### WordPress Toolkit
-- `plesk_wp_list_installations` - Alle WordPress-Installationen auflisten
-- `plesk_wp_get_installation` - Details einer WordPress-Installation abrufen
-- `plesk_wp_clone_installation` - WordPress-Installation klonen
-- `plesk_wp_create_backup` - Backup einer WordPress-Installation erstellen
-- `plesk_wp_restore_backup` - WordPress-Installation aus Backup wiederherstellen
-- `plesk_wp_list_backups` - Alle Backups für eine Installation auflisten
-- `plesk_wp_toggle_maintenance` - Wartungsmodus aktivieren/deaktivieren
-- `plesk_wp_clear_cache` - Cache für WordPress-Installationen leeren
-- `plesk_wp_get_background_task` - Status eines Background-Tasks abrufen
-- `plesk_wp_list_background_tasks` - Alle Background-Tasks für eine Installation
-- `plesk_wp_update_vulnerability_filtering` - Sicherheitsfilter aktivieren/deaktivieren
-- `plesk_wp_get_changelog` - WordPress Toolkit Changelog abrufen
-
-## Verwendungsbeispiele
-
-### Domains auflisten
-```
-Zeige mir alle Domains auf meinem Plesk-Server
-```
-
-### Domain erstellen
-```
-Erstelle eine neue Domain "example.com" für den Client mit ID 5
-```
-
-### Server-Informationen abrufen
-```
-Welche Plesk-Version läuft auf meinem Server?
-```
-
-### API-Key generieren
-```
-Generiere einen neuen API-Key für meinen Plesk-Server unter https://server.com:8443 mit Benutzername admin und Passwort xyz
-```
-
-### WordPress-Installationen verwalten
-```
-Zeige mir alle WordPress-Installationen auf meinem Server
-```
-
-```
-Erstelle ein Backup der WordPress-Installation mit ID 15
-```
-
-```
-Aktiviere den Wartungsmodus für die WordPress-Installation mit ID 15
-```
-
-```
-Klone die WordPress-Installation mit ID 15 nach staging.example.com
-```
-
-```
-Lösche den Cache für die WordPress-Installationen 10, 15 und 20
-```
 
 ## Mehrere Plesk-Instanzen
 

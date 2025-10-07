@@ -22,47 +22,7 @@ MCP Server für die Plesk REST API mit Unterstützung für mehrere Plesk-Instanz
 
 ## Installation
 
-```bash
-npm install
-npm run build
-```
-
-## Konfiguration
-
-1. Kopiere `.env.example` zu `.env`
-2. Trage deine Plesk-Instanzen ein:
-
-```env
-PLESK_URL=https://your-plesk-server.com
-PLESK_API_KEY=your-api-key
-
-PLESK_2_URL=https://second-server.com
-PLESK_2_API_KEY=second-api-key
-```
-
-## API-Key generieren
-
-### Automatisch über MCP Tool (empfohlen)
-
-Der MCP Server bietet ein Tool zur automatischen API-Key-Generierung:
-
-**In Claude Desktop:**
-```
-Verwende das Tool plesk_generate_api_key mit:
-- plesk_url: https://dein-server.com:8443
-- username: admin
-- password: dein-passwort
-- instance_name: default (oder instance_2, etc.)
-```
-
-Das Tool generiert automatisch einen API-Key und speichert ihn in der `.env` Datei. Nach einem Neustart des MCP Servers ist die Instanz verfügbar.
-
-### Manuell über Plesk UI
-
-1. Melde dich in Plesk an
-2. Gehe zu "Tools & Settings" > "API Keys"
-3. Erstelle einen neuen API-Key
-4. Kopiere den Key in deine `.env` Datei
+see INSTALL.md
 
 ## MCP Tools
 
@@ -111,23 +71,45 @@ Das Tool generiert automatisch einen API-Key und speichert ihn in der `.env` Dat
 - `plesk_wp_update_vulnerability_filtering` - Vulnerability-Filtering aktivieren/deaktivieren
 - `plesk_wp_get_changelog` - WordPress Toolkit Changelog abrufen
 
-## Verwendung mit Claude Desktop
+## Usage Examples
 
-Füge in der Claude Desktop Config (`claude_desktop_config.json`) hinzu:
-
-```json
-{
-  "mcpServers": {
-    "plesk": {
-      "command": "node",
-      "args": ["/yourgit/plesk_mcp/dist/index.js"]
-    }
-  }
-}
+### List domains
+```
+Show me all domains on my Plesk server
 ```
 
-## Entwicklung
+### Create domain
+```
+Create a new domain "example.com" for client with ID 5
+```
 
-```bash
-npm run dev
+### Retrieve server information
+```
+Which Plesk version is running on my server?
+```
+
+### Generate API key
+```
+Generate a new API key for my Plesk server at https://server.com:8443 with username admin and password xyz
+```
+
+### Manage WordPress installations
+```
+Show me all WordPress installations on my server
+```
+
+```
+Create a backup of WordPress installation with ID 15
+```
+
+```
+Enable maintenance mode for WordPress installation with ID 15
+```
+
+```
+Clone WordPress installation with ID 15 to staging.example.com
+```
+
+```
+Clear cache for WordPress installations 10, 15 and 20
 ```

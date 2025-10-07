@@ -73,18 +73,7 @@ PLESK_2_API_KEY=second-api-key-here
 
 ### 2. Obtaining an API Key
 
-You have several options to obtain an API key:
-
-#### Option A: Automatically via MCP Server (Recommended)
-
-After integrating with Claude Desktop, you can have the API key generated automatically:
-
-1. Start Claude Desktop
-2. Use the `plesk_generate_api_key` tool
-3. The key will be automatically written to the `.env` file
-4. Restart Claude Desktop to load the new key
-
-#### Option B: Manually via Plesk UI
+#### Option A: Manually via Plesk UI
 
 1. Log in to Plesk
 2. Navigate to: **Tools & Settings** → **API Keys**
@@ -92,11 +81,10 @@ After integrating with Claude Desktop, you can have the API key generated automa
 4. Copy the generated key
 5. Add it to your `.env` file
 
-#### Option C: Via Plesk CLI
+#### Option B: Via Plesk Extension
 
-```bash
-plesk ext call api-management --method create --params "name=MyAPIKey"
-```
+1. Install Plesk Extension "secret-keys-manager" 
+2. Open the Extension and add a new API Key
 
 ## Integration with Claude Desktop
 
@@ -112,7 +100,7 @@ The configuration file can be found here:
 
 Add the Plesk MCP Server to the configuration:
 
-#### For GitHub installation:
+#### Recomended: For GitHub installation:
 
 ```json
 {
@@ -122,30 +110,14 @@ Add the Plesk MCP Server to the configuration:
       "args": [
         "-y",
         "github:Powie/plesk_mcp#beta"
-      ]
+      ],
+      "env": {
+        "PLESK_1_URL": "https://my.server1.com:8443",
+        "PLESK_1_API_KEY": "total-secret-key"
+      }
    }
   }
 }
-```
-
-#### For local installation (development):
-
-```json
-{
-  "mcpServers": {
-    "plesk": {
-      "command": "node",
-      "args": ["/home/user/plesk-mcp-server/dist/index.js"]
-    }
-  }
-}
-```
-
-**Important:** Adjust the path to match your installation!
-
-For Linux/macOS use forward slashes:
-```json
-"args": ["/home/user/plesk_mcp/dist/index.js"]
 ```
 
 ### 3. Restart Claude Desktop
@@ -166,95 +138,6 @@ Show me all available Plesk instances
 
 Claude should now display the configured Plesk servers.
 
-## Available MCP Tools
-
-After installation, the following tools are available:
-
-### Server & Instances
-- `plesk_list_instances` - Show all configured Plesk instances
-- `plesk_get_server_info` - Retrieve server information
-- `plesk_list_ips` - List all IP addresses
-
-### API Key Management
-- `plesk_generate_api_key` - Generate and save new API key
-- `plesk_list_api_keys` - List all API keys
-- `plesk_delete_api_key` - Delete API key
-
-### Domain Management
-- `plesk_list_domains` - List all domains
-- `plesk_get_domain` - Retrieve domain details
-- `plesk_create_domain` - Create new domain
-- `plesk_update_domain` - Update domain
-- `plesk_delete_domain` - Delete domain
-
-### Client Management
-- `plesk_list_clients` - List all clients
-- `plesk_get_client` - Retrieve client details
-- `plesk_create_client` - Create new client
-- `plesk_update_client` - Update client
-- `plesk_suspend_client` - Suspend client
-- `plesk_activate_client` - Activate client
-
-### Extensions & CLI
-- `plesk_list_extensions` - List installed extensions
-- `plesk_execute_cli` - Execute Plesk CLI command
-
-### WordPress Toolkit
-- `plesk_wp_list_installations` - List all WordPress installations
-- `plesk_wp_get_installation` - Retrieve WordPress installation details
-- `plesk_wp_clone_installation` - Clone WordPress installation
-- `plesk_wp_create_backup` - Create backup of WordPress installation
-- `plesk_wp_restore_backup` - Restore WordPress installation from backup
-- `plesk_wp_list_backups` - List all backups for an installation
-- `plesk_wp_toggle_maintenance` - Enable/disable maintenance mode
-- `plesk_wp_clear_cache` - Clear cache for WordPress installations
-- `plesk_wp_get_background_task` - Retrieve background task status
-- `plesk_wp_list_background_tasks` - List all background tasks for an installation
-- `plesk_wp_update_vulnerability_filtering` - Enable/disable security filtering
-- `plesk_wp_get_changelog` - Retrieve WordPress Toolkit changelog
-
-## Usage Examples
-
-### List domains
-```
-Show me all domains on my Plesk server
-```
-
-### Create domain
-```
-Create a new domain "example.com" for client with ID 5
-```
-
-### Retrieve server information
-```
-Which Plesk version is running on my server?
-```
-
-### Generate API key
-```
-Generate a new API key for my Plesk server at https://server.com:8443 with username admin and password xyz
-```
-
-### Manage WordPress installations
-```
-Show me all WordPress installations on my server
-```
-
-```
-Create a backup of WordPress installation with ID 15
-```
-
-```
-Enable maintenance mode for WordPress installation with ID 15
-```
-
-```
-Clone WordPress installation with ID 15 to staging.example.com
-```
-
-```
-Clear cache for WordPress installations 10, 15 and 20
-```
 
 ## Multiple Plesk Instances
 
