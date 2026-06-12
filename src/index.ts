@@ -3,7 +3,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { loadPleskInstances } from './config.js';
-import { registerTools } from './tools.js';
+import { registerTools } from './tools/index.js';
 
 /**
  * Main MCP Server Entry Point
