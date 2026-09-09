@@ -18,9 +18,10 @@ export async function generateApiKey(
 ): Promise<string> {
   try {
     const response = await axios.post(
-      `${pleskUrl}/api/v2/auth/keys`,
+      `${pleskUrl.replace(/\/$/, '')}/api/v2/cli/secret_key/call`,
       {
-        description: description,
+        // /auth/keys defaults to the caller's IP. The CLI omits IP binding.
+        params: ['--create', '-description', description],
       },
       {
         auth: {
@@ -36,7 +37,11 @@ export async function generateApiKey(
       }
     );
 
-    return response.data.key || response.data;
+    const result = response.data;
+    if (result?.code !== 0 || typeof result.stdout !== 'string' || !result.stdout.trim()) {
+      throw new Error('Plesk did not return a valid API key from secret_key');
+    }
+    return result.stdout.trim();
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;

@@ -16,15 +16,19 @@ async function generateApiKey() {
     console.log(`Generiere API-Key für ${url}...`);
 
     const response = await axios.post(
-      `${url}/api/v2/auth/keys`,
-      { name: 'MCP Server API Key' },
+      `${url.replace(/\/$/, '')}/api/v2/cli/secret_key/call`,
+      // Omitting -ip-address creates a key usable after a client IP change.
+      { params: ['--create', '-description', 'MCP Server API Key'] },
       {
         auth: { username, password },
         httpsAgent: new https.Agent({ rejectUnauthorized: false })
       }
     );
 
-    const apiKey = response.data.key;
+    if (response.data?.code !== 0 || typeof response.data.stdout !== 'string' || !response.data.stdout.trim()) {
+      throw new Error('Plesk did not return a valid API key from secret_key');
+    }
+    const apiKey = response.data.stdout.trim();
     console.log('API-Key erfolgreich generiert!');
 
     const envPath = path.join(__dirname, '.env');

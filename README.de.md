@@ -22,7 +22,15 @@ MCP Server für die Plesk REST API mit Unterstützung für mehrere Plesk-Instanz
 
 ## Installation
 
-see INSTALL.md
+Siehe [INSTALL.de.md](INSTALL.de.md).
+
+## API-Key erzeugen
+
+`plesk_generate_api_key` erzeugt mit Plesk-Admin-Zugangsdaten einen Key ohne IP-Bindung und speichert ihn in der `.env`. Nach einem Neustart des MCP-Servers wird der neue Key geladen. Er bleibt auch bei einem Wechsel der öffentlichen Client-IP nutzbar.
+
+Das MCP-Tool und `generate-key.cjs` verwenden `/api/v2/cli/secret_key/call` mit `--create` und `-description`, ohne `-ip-address`. Voraussetzung ist der Zugriff auf diese CLI-Funktion über die REST-API. Es gibt keinen Rückfall auf `/auth/keys`, da dieser Endpunkt bei fehlendem `ip` die Absender-IP bindet.
+
+Bereits IP-gebundene Keys werden durch das Update nicht verändert. Erzeuge einen Ersatz, starte den MCP-Server neu und prüfe den Zugriff, bevor du den alten Key löschst. Siehe [Plesk secret_key-Dokumentation](https://docs.plesk.com/en-US/obsidian/cli-linux/73880/).
 
 ## MCP Tools
 

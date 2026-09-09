@@ -57,6 +57,10 @@ Use the plesk_generate_api_key tool with:
 
 The tool automatically generates an API key and saves it in the `.env` file. After restarting the MCP Server, the instance is available.
 
+New keys have no IP binding, so they remain usable when the client's public IP changes. Both the MCP tool and `generate-key.cjs` call `/api/v2/cli/secret_key/call` with `--create` and `-description`, without `-ip-address`. This requires administrator credentials and access to that CLI utility through the REST API. There is no fallback to `/auth/keys`, because that endpoint binds keys to the sender's IP when `ip` is omitted.
+
+Existing IP-bound keys are not changed by this update. Generate a replacement, restart the MCP server, and verify access before deleting the old key. See the [Plesk secret_key reference](https://docs.plesk.com/en-US/obsidian/cli-linux/73880/).
+
 ### Manually via Plesk UI
 
 1. Log in to Plesk
