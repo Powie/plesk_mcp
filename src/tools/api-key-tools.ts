@@ -11,7 +11,7 @@ import { jsonResult, run } from './helpers.js';
 export function registerApiKeyTools(server: McpServer) {
   server.tool(
     'plesk_generate_api_key',
-    'Generate a new Plesk API key using admin username/password and save it to the local .env file. Use this for initial setup or key rotation when no working API key is configured yet. The MCP server must be restarted afterwards to pick up the new key.',
+    'Generate a new Plesk API key without IP binding using admin username/password and save it to the local .env file. Supports clients with changing public IP addresses. Requires access to the Plesk secret_key CLI utility via REST API. Use this for initial setup or key rotation. The MCP server must be restarted afterwards to pick up the new key.',
     {
       plesk_url: z.string().describe('Plesk server URL including port, e.g. "https://your-server.com:8443"'),
       username: z.string().describe('Plesk admin username'),
