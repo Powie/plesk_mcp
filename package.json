@@ -1,6 +1,6 @@
 {
   "name": "plesk-mcp-server",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "MCP Server for Plesk REST API - supports multiple Plesk instances",
   "type": "module",
   "main": "dist/index.js",

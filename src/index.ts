@@ -4,6 +4,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { loadPleskInstances } from './config.js';
 import { registerTools } from './tools/index.js';
+import { registerPrompts } from './prompts/index.js';
 
 /**
  * Main MCP Server Entry Point
@@ -31,6 +32,9 @@ async function main() {
 
   // Register all tools
   registerTools(server, instances);
+
+  // Register workflow prompts
+  registerPrompts(server);
 
   // Create stdio transport
   const transport = new StdioServerTransport();

@@ -115,6 +115,27 @@ Existing IP-bound keys are not changed by this update. Generate a replacement, r
 - `plesk_wp_update_vulnerability_filtering` - Enable/disable vulnerability filtering
 - `plesk_wp_get_changelog` - Retrieve WordPress Toolkit changelog
 
+## Skill & Prompts
+
+To help Claude use the tools efficiently and safely, the repository ships a usage skill and a set of MCP prompts.
+
+### Agent Skill (`skills/plesk/SKILL.md`)
+
+Teaches Claude the right call order (instance -> ID lookup -> action -> poll background task), which operations need confirmation, useful Plesk CLI calls and ready-made recipes.
+
+- **Claude Code:** `cp -r skills/plesk ~/.claude/skills/` (or `.claude/skills/` inside a project)
+- **Claude Desktop / claude.ai:** zip the `skills/plesk` folder and upload it under Settings > Capabilities > Skills
+
+### MCP Prompts
+
+Available in every MCP client that supports prompts (e.g. as slash commands):
+
+- `plesk_server_overview` - Summarize version, IPs, extensions, domains, clients and WordPress sites
+- `plesk_wp_safe_maintenance` - Backup -> maintenance mode -> work -> clear cache -> back online
+- `plesk_wp_staging_clone` - Clone a WordPress site to a staging domain
+- `plesk_onboard_customer` - Create a customer and their first domain
+- `plesk_rotate_api_key` - Generate a new API key, verify it, delete the old one
+
 ## Usage with Claude Desktop
 
 Add to Claude Desktop Config (`claude_desktop_config.json`):

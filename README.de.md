@@ -79,6 +79,27 @@ Bereits IP-gebundene Keys werden durch das Update nicht verändert. Erzeuge eine
 - `plesk_wp_update_vulnerability_filtering` - Vulnerability-Filtering aktivieren/deaktivieren
 - `plesk_wp_get_changelog` - WordPress Toolkit Changelog abrufen
 
+## Skill & Prompts
+
+Damit Claude die Tools effizient und sicher nutzt, liefert das Repository einen Skill und mehrere MCP-Prompts mit.
+
+### Agent Skill (`skills/plesk/SKILL.md`)
+
+Vermittelt Claude die richtige Aufrufreihenfolge (Instanz -> ID nachschlagen -> Aktion -> Background-Task abfragen), welche Operationen eine Bestätigung brauchen, nützliche Plesk-CLI-Aufrufe und fertige Abläufe.
+
+- **Claude Code:** `cp -r skills/plesk ~/.claude/skills/` (oder `.claude/skills/` im Projekt)
+- **Claude Desktop / claude.ai:** Ordner `skills/plesk` zippen und unter Einstellungen > Funktionen > Skills hochladen
+
+### MCP-Prompts
+
+In jedem MCP-Client mit Prompt-Unterstützung verfügbar (z. B. als Slash-Commands):
+
+- `plesk_server_overview` - Überblick über Version, IPs, Extensions, Domains, Kunden und WordPress-Seiten
+- `plesk_wp_safe_maintenance` - Backup -> Wartungsmodus -> Arbeiten -> Cache leeren -> wieder online
+- `plesk_wp_staging_clone` - WordPress-Seite auf eine Staging-Domain klonen
+- `plesk_onboard_customer` - Kunden und erste Domain anlegen
+- `plesk_rotate_api_key` - Neuen API-Key erzeugen, prüfen, alten löschen
+
 ## Usage Examples
 
 ### List domains
