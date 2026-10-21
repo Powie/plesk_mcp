@@ -22,9 +22,10 @@ MCP Server for the Plesk REST API with support for multiple Plesk instances.
 
 ## Installation
 
+Requires Node.js 20 or newer. See [INSTALL.md](INSTALL.md) for all options.
+
 ```bash
-npm install
-npm run build
+npm install   # also compiles TypeScript via the prepare script
 ```
 
 ## Configuration
@@ -38,6 +39,14 @@ PLESK_API_KEY=your-api-key
 
 PLESK_2_URL=https://second-server.com
 PLESK_2_API_KEY=second-api-key
+```
+
+Variables can also be set in the `env` block of the MCP client configuration; they take precedence over `.env`.
+
+Plesk often uses a self-signed certificate, so TLS certificate verification is disabled by default. If your server has a valid certificate, enable verification:
+
+```env
+PLESK_VERIFY_TLS=true
 ```
 
 ## Generate API Key
@@ -79,17 +88,22 @@ Existing IP-bound keys are not changed by this update. Generate a replacement, r
 ### Domain Management
 - `plesk_list_domains` - List all domains
 - `plesk_get_domain` - Retrieve domain details
-- `plesk_create_domain` - Create new domain
+- `plesk_create_domain` - Create new domain (new subscription or added to an existing one; owner, plan, IPs, FTP login)
 - `plesk_update_domain` - Update domain
+- `plesk_get_domain_status` - Get domain status
+- `plesk_set_domain_status` - Activate, suspend or disable domain
 - `plesk_delete_domain` - Delete domain
 
 ### Client Management
 - `plesk_list_clients` - List all clients
 - `plesk_get_client` - Retrieve client details
+- `plesk_list_client_domains` - List domains of a client
+- `plesk_get_client_statistics` - Client resource usage
 - `plesk_create_client` - Create new client
 - `plesk_update_client` - Update client
 - `plesk_suspend_client` - Suspend client
 - `plesk_activate_client` - Activate client
+- `plesk_delete_client` - Delete client
 
 ### Server Management
 - `plesk_get_server_info` - Server information
@@ -102,18 +116,19 @@ Existing IP-bound keys are not changed by this update. Generate a replacement, r
 - `plesk_execute_cli` - Execute Plesk CLI command
 
 ### WordPress Toolkit
-- `plesk_wp_list_installations` - List all WordPress installations
+- `plesk_wp_list_installations` - List all WordPress installations (optionally filtered)
 - `plesk_wp_get_installation` - WordPress installation details
-- `plesk_wp_clone_installation` - Clone WordPress installation
+- `plesk_wp_clone_installation` - Clone WordPress installation to an existing domain or a new subdomain
 - `plesk_wp_create_backup` - Create backup
 - `plesk_wp_restore_backup` - Restore backup
 - `plesk_wp_list_backups` - List all backups
 - `plesk_wp_toggle_maintenance` - Enable/disable maintenance mode
 - `plesk_wp_clear_cache` - Clear cache
 - `plesk_wp_get_background_task` - Retrieve background task status
-- `plesk_wp_list_background_tasks` - List background tasks
 - `plesk_wp_update_vulnerability_filtering` - Enable/disable vulnerability filtering
 - `plesk_wp_get_changelog` - Retrieve WordPress Toolkit changelog
+
+All tools carry MCP annotations (`readOnlyHint`, `destructiveHint`), so clients can ask for confirmation before destructive calls.
 
 ## Skill & Prompts
 
@@ -151,8 +166,32 @@ Add to Claude Desktop Config (`claude_desktop_config.json`):
 }
 ```
 
+Or without a local clone, directly from GitHub:
+
+```json
+{
+  "mcpServers": {
+    "plesk": {
+      "command": "npx",
+      "args": ["-y", "github:Powie/plesk_mcp"],
+      "env": {
+        "PLESK_URL": "https://your-server.com:8443",
+        "PLESK_API_KEY": "your-api-key"
+      }
+    }
+  }
+}
+```
+
+## Usage with Claude Code
+
+```bash
+claude mcp add plesk -e PLESK_URL=https://your-server.com:8443 -e PLESK_API_KEY=your-api-key -- node /yourgit/plesk_mcp/dist/index.js
+```
+
 ## Development
 
 ```bash
-npm run dev
+npm run dev   # compile and start
+npm test      # run tests
 ```

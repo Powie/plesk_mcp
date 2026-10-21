@@ -70,3 +70,10 @@ export async function run(action: () => Promise<unknown>): Promise<ToolResult> {
     return errorResult(error);
   }
 }
+
+/**
+ * Tool annotations that tell MCP clients how risky a tool is
+ */
+export const READ_ONLY = { readOnlyHint: true, openWorldHint: true } as const;
+export const WRITE = { readOnlyHint: false, destructiveHint: false, openWorldHint: true } as const;
+export const DESTRUCTIVE = { readOnlyHint: false, destructiveHint: true, openWorldHint: true } as const;

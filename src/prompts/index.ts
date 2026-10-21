@@ -79,18 +79,18 @@ Steps:
       argsSchema: {
         instance: instanceArg,
         site: z.string().describe('Domain or URL of the source WordPress site'),
-        target_domain: z.string().describe('Domain that receives the clone, e.g. "staging.example.com"'),
-        target_path: z.string().optional().describe('Optional path on the target domain'),
+        target_domain: z.string().describe('Existing domain that receives the clone, or the parent domain for target_subdomain'),
+        target_subdomain: z.string().optional().describe('Name of a new subdomain to create for the clone, e.g. "staging"'),
       },
     },
     (args) =>
-      userPrompt(`Create a staging copy of the WordPress site "${args.site}" on "${args.target_domain}${args.target_path ?? ''}". ${instanceHint(args.instance)}
+      userPrompt(`Create a staging copy of the WordPress site "${args.site}" on "${args.target_subdomain ? `${args.target_subdomain}.` : ''}${args.target_domain}". ${instanceHint(args.instance)}
 
 Steps:
 1. plesk_wp_list_installations with filter "${args.site}" to find the source installation_id.
 2. plesk_list_domains to check that "${args.target_domain}" exists. If not, ask before creating it with plesk_create_domain.
 3. Offer a backup of the source (plesk_wp_create_backup) before cloning.
-4. plesk_wp_clone_installation with target_domain${args.target_path ? ' and target_path' : ''}; wait for the background task.
+4. plesk_wp_clone_installation with target_domain "${args.target_domain}"${args.target_subdomain ? ` and target_subdomain "${args.target_subdomain}"` : ''}; wait for the background task (task.code / task.id).
 5. plesk_wp_list_installations to confirm the new installation and report its ID and URL.`)
   );
 
@@ -114,7 +114,7 @@ Steps:
 2. Ask the user for login, password and company (or propose a login and ask for confirmation).
 3. plesk_create_client with type "customer".
 4. plesk_list_ips - pick the shared IP unless the user wants a dedicated one.
-5. plesk_create_domain with hosting_type "virtual".
+5. Ask for FTP login and password, then plesk_create_domain with owner_client_id, hosting_type "virtual", ftp_login, ftp_password and ip_addresses.
 6. Summarize client ID, login, domain ID and IP. Do not repeat the password.`)
   );
 
@@ -136,6 +136,6 @@ Steps:
 2. plesk_list_api_keys - note the existing key IDs.
 3. plesk_generate_api_key with instance_name "${args.instance_name ?? 'default'}" - this writes the new key to .env.
 4. Tell the user to restart the MCP server, then verify access with plesk_get_server_info.
-5. Only after successful verification and explicit confirmation: plesk_delete_api_key for the old key.`)
+5. Only after successful verification and explicit confirmation: plesk_delete_api_key with the old key's value.`)
   );
 }

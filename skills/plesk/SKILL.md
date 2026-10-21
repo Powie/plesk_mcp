@@ -15,16 +15,17 @@ Guidance for working with the `plesk_*` tools of the Plesk MCP server.
 
 ## 2. Never guess IDs - look them up
 
-All mutating tools take numeric IDs. Resolve them from names first and reuse them for the rest of the conversation:
+Most tools take IDs or exact names. Resolve them first and reuse them for the rest of the conversation:
 
 | Need | Lookup tool |
 |------|-------------|
 | `domain_id` | `plesk_list_domains` |
 | `client_id` | `plesk_list_clients` |
-| `ip_address_id` | `plesk_list_ips` |
+| `ip_addresses` (for `plesk_create_domain`) | `plesk_list_ips` |
+| `base_domain_id` (add a domain to an existing subscription) | `plesk_list_domains` / `plesk_list_client_domains` |
 | WordPress `installation_id` | `plesk_wp_list_installations` (use `filter` with the domain to keep the result small) |
-| `backup_id` | `plesk_wp_list_backups` |
-| API `key_id` | `plesk_list_api_keys` |
+| Backup `file_name` | `plesk_wp_list_backups` |
+| `api_key` to delete | `plesk_list_api_keys` |
 
 If a lookup returns several matches, show them and let the user choose.
 
@@ -32,16 +33,16 @@ If a lookup returns several matches, show them and let the user choose.
 
 `plesk_wp_create_backup`, `plesk_wp_restore_backup` and `plesk_wp_clone_installation` start a background task and return immediately.
 
-1. Take the task code and task ID from the response.
+1. Take `task.code` and `task.id` from the response.
 2. Poll `plesk_wp_get_background_task` until the task is finished or failed. Space out the polls; don't hammer the API.
-3. If the response did not contain a task ID, use `plesk_wp_list_background_tasks` for the installation.
-4. Only continue with dependent steps (e.g. maintenance mode after a backup) once the task has succeeded. Report failures with the task's error message.
+3. Only continue with dependent steps (e.g. maintenance mode after a backup) once the task has succeeded. Report failures with the task's error message.
 
 ## 4. Safety rules
 
 Ask for explicit confirmation - naming the instance and the exact object - before:
 
-- `plesk_delete_domain` (irreversible)
+- `plesk_delete_domain`, `plesk_delete_client` (irreversible)
+- `plesk_set_domain_status` with `suspended` / `disabled` (site goes offline)
 - `plesk_wp_restore_backup` (overwrites files and database; offer a fresh backup first)
 - `plesk_suspend_client` (takes the customer's sites offline)
 - `plesk_delete_api_key` (clients using the key lose access immediately)
@@ -88,11 +89,13 @@ Tool errors come back as `{"error": "...", "details": ...}`.
 
 **Safe WordPress maintenance**: find installation -> `plesk_wp_create_backup` (wait for task) -> `plesk_wp_toggle_maintenance` `enabled: true` -> do the work -> `plesk_wp_clear_cache` -> `plesk_wp_toggle_maintenance` `enabled: false`. Always switch maintenance off again, also after errors.
 
-**Staging clone**: find installation -> optional backup -> `plesk_wp_clone_installation` with `target_domain` / `target_path` (target domain must exist; create it with `plesk_create_domain` after confirmation) -> wait for task -> `plesk_wp_list_installations` to show the new site.
+**Staging clone**: find installation -> optional backup -> `plesk_wp_clone_installation` with `target_domain` (existing domain) or `target_domain` + `target_subdomain` (creates e.g. `staging.example.com`), optional `target_path` -> wait for task -> `plesk_wp_list_installations` to show the new site.
 
-**Onboard customer**: `plesk_list_clients` (avoid duplicates) -> `plesk_create_client` -> `plesk_list_ips` -> `plesk_create_domain` -> summarize login, domain and IP (without the password).
+**Onboard customer**: `plesk_list_clients` (avoid duplicates) -> `plesk_create_client` -> `plesk_list_ips` -> `plesk_create_domain` with `owner_client_id`, `hosting_type: "virtual"`, `ftp_login` / `ftp_password` and optionally `ip_addresses` / `plan_name` -> summarize login, domain and IP (without passwords).
 
-**Rotate API key**: `plesk_generate_api_key` (writes `.env`) -> tell the user to restart the MCP server -> verify with `plesk_get_server_info` -> `plesk_list_api_keys` -> delete the old key only after verification and confirmation.
+**Customer report**: `plesk_get_client` -> `plesk_list_client_domains` -> `plesk_get_client_statistics` (disk/traffic usage).
+
+**Rotate API key**: `plesk_generate_api_key` (writes `.env`) -> tell the user to restart the MCP server -> verify with `plesk_get_server_info` -> `plesk_list_api_keys` -> delete the old key (`api_key` = its value) only after verification and confirmation.
 
 ## 9. Presenting results
 

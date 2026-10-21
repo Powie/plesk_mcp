@@ -1,7 +1,11 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { generateApiKey, saveApiKeyToEnv, listApiKeys, deleteApiKey } from '../auth.js';
-import { jsonResult, run } from './helpers.js';
+import { jsonResult, run, WRITE, DESTRUCTIVE } from './helpers.js';
+
+const pleskUrl = z.string().describe('Plesk server URL including port, e.g. "https://your-server.com:8443"');
+const username = z.string().describe('Plesk admin username');
+const password = z.string().describe('Plesk admin password');
 
 /**
  * API key management tools.
@@ -9,15 +13,18 @@ import { jsonResult, run } from './helpers.js';
  * since they are used to bootstrap or rotate the API keys themselves.
  */
 export function registerApiKeyTools(server: McpServer) {
-  server.tool(
+  server.registerTool(
     'plesk_generate_api_key',
-    'Generate a new Plesk API key without IP binding using admin username/password and save it to the local .env file. Supports clients with changing public IP addresses. Requires access to the Plesk secret_key CLI utility via REST API. Use this for initial setup or key rotation. The MCP server must be restarted afterwards to pick up the new key.',
     {
-      plesk_url: z.string().describe('Plesk server URL including port, e.g. "https://your-server.com:8443"'),
-      username: z.string().describe('Plesk admin username'),
-      password: z.string().describe('Plesk admin password'),
-      instance_name: z.string().optional().describe('Instance name used in .env: "default", "instance_2", etc.'),
-      description: z.string().optional().describe('Description stored with the API key in Plesk'),
+      description: 'Generate a new Plesk API key without IP binding using admin username/password and save it to the .env file of the MCP server. Supports clients with changing public IP addresses. Requires access to the Plesk secret_key CLI utility via REST API. Use this for initial setup or key rotation. The MCP server must be restarted afterwards to pick up the new key.',
+      inputSchema: {
+        plesk_url: pleskUrl,
+        username,
+        password,
+        instance_name: z.string().optional().describe('Instance name used in .env: "default", "instance_2", etc.'),
+        description: z.string().optional().describe('Description stored with the API key in Plesk'),
+      },
+      annotations: WRITE,
     },
     async (args) =>
       run(async () => {
@@ -35,30 +42,32 @@ export function registerApiKeyTools(server: McpServer) {
       })
   );
 
-  server.tool(
+  server.registerTool(
     'plesk_list_api_keys',
-    'List all API keys registered on a Plesk server, with their IDs and descriptions. Requires admin username/password. Use this to find a key ID for plesk_delete_api_key.',
     {
-      plesk_url: z.string().describe('Plesk server URL including port, e.g. "https://your-server.com:8443"'),
-      username: z.string().describe('Plesk admin username'),
-      password: z.string().describe('Plesk admin password'),
+      description: 'List all API keys registered on a Plesk server (output of "secret_key --list": keys, IP restrictions, descriptions). Requires admin username/password. Use this to find the key value for plesk_delete_api_key.',
+      inputSchema: { plesk_url: pleskUrl, username, password },
+      annotations: { readOnlyHint: true, openWorldHint: true },
     },
     async (args) => run(() => listApiKeys(args.plesk_url, args.username, args.password))
   );
 
-  server.tool(
+  server.registerTool(
     'plesk_delete_api_key',
-    'Delete an API key from a Plesk server. Requires admin username/password. Irreversible — any client still using the key loses access immediately.',
     {
-      plesk_url: z.string().describe('Plesk server URL including port, e.g. "https://your-server.com:8443"'),
-      username: z.string().describe('Plesk admin username'),
-      password: z.string().describe('Plesk admin password'),
-      key_id: z.string().describe('API key ID from plesk_list_api_keys'),
+      description: 'Delete an API key from a Plesk server. Requires admin username/password. Irreversible — any client still using the key loses access immediately. Confirm with the user before calling.',
+      inputSchema: {
+        plesk_url: pleskUrl,
+        username,
+        password,
+        api_key: z.string().describe('The API key value to delete, as shown by plesk_list_api_keys'),
+      },
+      annotations: DESTRUCTIVE,
     },
     async (args) =>
       run(async () => {
-        await deleteApiKey(args.plesk_url, args.username, args.password, args.key_id);
-        return { success: true, message: `API key ${args.key_id} deleted successfully` };
+        await deleteApiKey(args.plesk_url, args.username, args.password, args.api_key);
+        return { success: true, message: 'API key deleted successfully' };
       })
   );
 }

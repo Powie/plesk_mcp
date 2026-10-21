@@ -22,7 +22,17 @@ MCP Server für die Plesk REST API mit Unterstützung für mehrere Plesk-Instanz
 
 ## Installation
 
-Siehe [INSTALL.de.md](INSTALL.de.md).
+Voraussetzung ist Node.js 20 oder neuer. Siehe [INSTALL.de.md](INSTALL.de.md).
+
+## Konfiguration
+
+Instanzen werden über `PLESK_URL`/`PLESK_API_KEY` bzw. `PLESK_N_URL`/`PLESK_N_API_KEY` konfiguriert – in der `.env` oder im `env`-Block der MCP-Client-Konfiguration (hat Vorrang).
+
+Da Plesk häufig ein selbstsigniertes Zertifikat nutzt, ist die TLS-Zertifikatsprüfung standardmäßig aus. Bei gültigem Zertifikat einschalten:
+
+```env
+PLESK_VERIFY_TLS=true
+```
 
 ## API-Key erzeugen
 
@@ -43,17 +53,22 @@ Bereits IP-gebundene Keys werden durch das Update nicht verändert. Erzeuge eine
 ### Domain Management
 - `plesk_list_domains` - Liste aller Domains
 - `plesk_get_domain` - Domain-Details abrufen
-- `plesk_create_domain` - Neue Domain erstellen
+- `plesk_create_domain` - Neue Domain erstellen (neues Abonnement oder in bestehendes; Besitzer, Tarif, IPs, FTP-Login)
 - `plesk_update_domain` - Domain aktualisieren
+- `plesk_get_domain_status` - Domain-Status abrufen
+- `plesk_set_domain_status` - Domain aktivieren, sperren oder deaktivieren
 - `plesk_delete_domain` - Domain löschen
 
 ### Client Management
 - `plesk_list_clients` - Liste aller Clients
 - `plesk_get_client` - Client-Details abrufen
+- `plesk_list_client_domains` - Domains eines Clients auflisten
+- `plesk_get_client_statistics` - Ressourcenverbrauch eines Clients
 - `plesk_create_client` - Neuen Client erstellen
 - `plesk_update_client` - Client aktualisieren
 - `plesk_suspend_client` - Client suspendieren
 - `plesk_activate_client` - Client aktivieren
+- `plesk_delete_client` - Client löschen
 
 ### Server Management
 - `plesk_get_server_info` - Server-Informationen
@@ -66,18 +81,19 @@ Bereits IP-gebundene Keys werden durch das Update nicht verändert. Erzeuge eine
 - `plesk_execute_cli` - Plesk CLI-Befehl ausführen
 
 ### WordPress Toolkit
-- `plesk_wp_list_installations` - Liste aller WordPress-Installationen
+- `plesk_wp_list_installations` - Liste aller WordPress-Installationen (optional gefiltert)
 - `plesk_wp_get_installation` - Details einer WordPress-Installation
-- `plesk_wp_clone_installation` - WordPress-Installation klonen
+- `plesk_wp_clone_installation` - WordPress-Installation auf bestehende Domain oder neue Subdomain klonen
 - `plesk_wp_create_backup` - Backup erstellen
 - `plesk_wp_restore_backup` - Backup wiederherstellen
 - `plesk_wp_list_backups` - Alle Backups auflisten
 - `plesk_wp_toggle_maintenance` - Wartungsmodus aktivieren/deaktivieren
 - `plesk_wp_clear_cache` - Cache leeren
 - `plesk_wp_get_background_task` - Status eines Background-Tasks abrufen
-- `plesk_wp_list_background_tasks` - Background-Tasks auflisten
 - `plesk_wp_update_vulnerability_filtering` - Vulnerability-Filtering aktivieren/deaktivieren
 - `plesk_wp_get_changelog` - WordPress Toolkit Changelog abrufen
+
+Alle Tools tragen MCP-Annotations (`readOnlyHint`, `destructiveHint`), damit Clients vor destruktiven Aufrufen nachfragen können.
 
 ## Skill & Prompts
 

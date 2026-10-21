@@ -1,11 +1,7 @@
 import axios from 'axios';
-import https from 'https';
 import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { createHttpsAgent, normalizeUrl } from './api-client.js';
+import { ENV_PATH } from './config.js';
 
 /**
  * Generate API key using username/password authentication
@@ -18,7 +14,7 @@ export async function generateApiKey(
 ): Promise<string> {
   try {
     const response = await axios.post(
-      `${pleskUrl.replace(/\/$/, '')}/api/v2/cli/secret_key/call`,
+      `${normalizeUrl(pleskUrl)}/api/v2/cli/secret_key/call`,
       {
         // /auth/keys defaults to the caller's IP. The CLI omits IP binding.
         params: ['--create', '-description', description],
@@ -31,9 +27,7 @@ export async function generateApiKey(
         headers: {
           'Content-Type': 'application/json',
         },
-        httpsAgent: new https.Agent({
-          rejectUnauthorized: false,
-        }),
+        httpsAgent: createHttpsAgent(),
       }
     );
 
@@ -60,7 +54,7 @@ export function saveApiKeyToEnv(
   pleskUrl: string,
   apiKey: string
 ): void {
-  const envPath = path.join(__dirname, '..', '.env');
+  const envPath = ENV_PATH;
 
   let envContent = '';
 
@@ -109,28 +103,29 @@ export function saveApiKeyToEnv(
 }
 
 /**
- * List all existing API keys
+ * List all API keys via the secret_key CLI utility.
+ * The REST API has no endpoint for listing keys.
  */
 export async function listApiKeys(
   pleskUrl: string,
   username: string,
   password: string
-): Promise<any[]> {
+): Promise<string> {
   try {
-    const response = await axios.get(
-      `${pleskUrl}/api/v2/auth/keys`,
+    const response = await axios.post(
+      `${normalizeUrl(pleskUrl)}/api/v2/cli/secret_key/call`,
+      { params: ['--list'] },
       {
-        auth: {
-          username: username,
-          password: password,
-        },
-        httpsAgent: new https.Agent({
-          rejectUnauthorized: false,
-        }),
+        auth: { username, password },
+        httpsAgent: createHttpsAgent(),
       }
     );
 
-    return response.data;
+    const result = response.data;
+    if (result?.code !== 0) {
+      throw new Error(`secret_key --list failed: ${result?.stderr || result?.stdout || 'unknown error'}`);
+    }
+    return result.stdout;
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;
@@ -142,25 +137,20 @@ export async function listApiKeys(
 }
 
 /**
- * Delete an API key
+ * Delete an API key. The REST API identifies keys by their value.
  */
 export async function deleteApiKey(
   pleskUrl: string,
   username: string,
   password: string,
-  keyId: string
+  apiKey: string
 ): Promise<void> {
   try {
     await axios.delete(
-      `${pleskUrl}/api/v2/auth/keys/${keyId}`,
+      `${normalizeUrl(pleskUrl)}/api/v2/auth/keys/${encodeURIComponent(apiKey)}`,
       {
-        auth: {
-          username: username,
-          password: password,
-        },
-        httpsAgent: new https.Agent({
-          rejectUnauthorized: false,
-        }),
+        auth: { username, password },
+        httpsAgent: createHttpsAgent(),
       }
     );
   } catch (error: any) {

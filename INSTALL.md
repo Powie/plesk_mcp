@@ -4,7 +4,7 @@ This guide describes how to install and configure the Plesk MCP Server for use w
 
 ## Prerequisites
 
-- Node.js (version 18 or higher)
+- Node.js (version 20 or higher)
 - npm or yarn
 - Access to one or more Plesk servers
 - Claude Desktop (for use with Claude)
@@ -23,7 +23,7 @@ The project will be automatically downloaded, dependencies installed, and TypeSc
 
 **Note:** You can also install a specific branch:
 ```bash
-npm install github:Powie/plesk_mcp#beta
+npm install github:Powie/plesk_mcp#dev
 ```
 
 ### Option B: Local Installation (Development)
@@ -109,15 +109,23 @@ Add the Plesk MCP Server to the configuration:
       "command": "npx",
       "args": [
         "-y",
-        "github:Powie/plesk_mcp#beta"
+        "github:Powie/plesk_mcp"
       ],
       "env": {
-        "PLESK_1_URL": "https://my.server1.com:8443",
-        "PLESK_1_API_KEY": "total-secret-key"
+        "PLESK_URL": "https://my.server1.com:8443",
+        "PLESK_API_KEY": "total-secret-key"
       }
    }
   }
 }
+```
+
+Further servers are added as `PLESK_2_URL`/`PLESK_2_API_KEY` etc. If your server has a valid TLS certificate, also set `"PLESK_VERIFY_TLS": "true"`.
+
+#### Claude Code
+
+```bash
+claude mcp add plesk -e PLESK_URL=https://my.server1.com:8443 -e PLESK_API_KEY=total-secret-key -- npx -y github:Powie/plesk_mcp
 ```
 
 ### 3. Restart Claude Desktop
@@ -127,6 +135,8 @@ Completely restart Claude Desktop for the changes to take effect.
 Add the first server with this prompt:
 
 Add a new Plesk server, server name: https://server.xx:8443 with username: user and password: secretpassword
+
+The server also starts without any configured instance, so the first key can be created this way. The key is written to the `.env` in the package directory. When installed via `npx` this lives in the npm cache and may be lost on updates, so copy the key into the `env` block of the configuration.
 
 ### 4. Test connection
 
@@ -171,6 +181,10 @@ When calling the tools, you can then specify the desired instance.
 2. Test the connection in your browser
 3. Check if the API key is still valid
 4. Ensure that the Plesk server is reachable from your network
+
+### Certificate errors
+
+With `PLESK_VERIFY_TLS=true` the Plesk server needs a valid certificate for the hostname in the URL. Leave the variable unset for self-signed certificates.
 
 ### API key not working
 

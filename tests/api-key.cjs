@@ -28,6 +28,11 @@ for (const entry of ['src/auth.ts', 'generate-key.cjs']) {
         require: (name) => name === 'axios' ? axios : name === 'fs' ? {
           existsSync: () => false,
           writeFileSync: () => { saved = true; },
+        } : name === './api-client.js' ? {
+          createHttpsAgent: () => undefined,
+          normalizeUrl: (url) => url.replace(/\/+$/, ''),
+        } : name === './config.js' ? {
+          ENV_PATH: path.join(__dirname, '.env'),
         } : require(name),
         process: { argv: ['node', entry, 'https://example.test:8443/', 'admin', 'test-password'], exit: () => { throw new Error('exit'); } },
         console: { log() {}, error() {} },
