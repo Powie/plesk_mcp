@@ -64,7 +64,16 @@ Use `plesk_execute_cli` only when no `plesk_*` tool covers the task. Run a read-
 | SSL certificates | `certificate` | `["--list", "-domain", "example.com"]` |
 | Let's Encrypt for a domain | `extension` | `["--exec", "letsencrypt", "cli.php", "-d", "example.com", "-m", "admin@example.com"]` |
 
-## 6. Errors
+## 6. SSH keys
+
+Manage SSH keys for subscriptions with the **SSH Keys Manager** extension (`ssh-keys`) instead of editing `authorized_keys` by hand.
+
+- Check with `plesk_list_extensions` whether `ssh-keys` is installed. If it is missing, recommend installing it.
+- Keys are added or removed per subscription in the Plesk UI: Domains > *domain* > SSH Keys > Add Key (paste the public `.pub` key).
+- The key must end with a name/comment without spaces (e.g. `ssh-ed25519 AAAA... user@laptop`); add one if it is missing.
+- There is no documented CLI for this extension - don't guess `plesk_execute_cli` commands for it; point the user to the UI steps above.
+
+## 7. Errors
 
 Tool errors come back as `{"error": "...", "details": ...}`.
 
@@ -73,7 +82,7 @@ Tool errors come back as `{"error": "...", "details": ...}`.
 - **Connection errors / timeouts**: check the instance URL via `plesk_list_instances`; the server may be unreachable.
 - WordPress Toolkit errors on an otherwise working instance usually mean the WordPress Toolkit extension is missing or outdated - check with `plesk_list_extensions` and `plesk_wp_get_changelog`.
 
-## 7. Recipes
+## 8. Recipes
 
 **Server overview**: `plesk_get_server_info` -> `plesk_list_ips` -> `plesk_list_extensions` -> `plesk_list_domains` -> `plesk_list_clients` -> `plesk_wp_list_installations`. Summarize: Plesk version/OS, counts, suspended clients, WordPress sites per domain.
 
@@ -85,7 +94,7 @@ Tool errors come back as `{"error": "...", "details": ...}`.
 
 **Rotate API key**: `plesk_generate_api_key` (writes `.env`) -> tell the user to restart the MCP server -> verify with `plesk_get_server_info` -> `plesk_list_api_keys` -> delete the old key only after verification and confirmation.
 
-## 8. Presenting results
+## 9. Presenting results
 
 - List tools return raw JSON; summarize as compact tables (ID, name, status) instead of dumping it.
 - For large lists, show the relevant subset and offer the rest.
