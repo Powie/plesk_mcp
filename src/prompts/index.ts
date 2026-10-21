@@ -133,9 +133,9 @@ Steps:
 
 Steps:
 1. Ask the user for the Plesk admin username and password.
-2. plesk_list_api_keys - note the existing key IDs.
+2. Ask the user to note the current key value (PLESK_API_KEY in .env or the MCP client config) - Plesk only stores hashes, so it cannot be looked up later.
 3. plesk_generate_api_key with instance_name "${args.instance_name ?? 'default'}" - this writes the new key to .env.
 4. Tell the user to restart the MCP server, then verify access with plesk_get_server_info.
-5. Only after successful verification and explicit confirmation: plesk_delete_api_key with the old key's value.`)
+5. Only after successful verification and explicit confirmation: plesk_delete_api_key with the old key's value, or remove it in the "Keychain for API Secret Keys" extension (secret-keys-manager).`)
   );
 }

@@ -83,8 +83,10 @@ PLESK_2_API_KEY=second-api-key-here
 
 #### Option B: Über Plesk Extension
 
-1. Installieren Sie die Plesk Extension "secret-keys-manager"
-2. Öffnen Sie die Extension und fügen Sie einen neuen API Key hinzu
+1. Installieren Sie die Plesk Extension **Keychain for API Secret Keys** (`secret-keys-manager`)
+2. Öffnen Sie die Extension und fügen Sie einen neuen API Key hinzu (ab Extension-Version 2.0)
+
+Die Extension zeigt außerdem alle vorhandenen Keys mit Besitzer und IP-Bindung an und kann alte Keys löschen.
 
 ## Integration mit Claude Desktop
 

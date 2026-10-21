@@ -45,7 +45,7 @@ export function registerApiKeyTools(server: McpServer) {
   server.registerTool(
     'plesk_list_api_keys',
     {
-      description: 'List all API keys registered on a Plesk server (output of "secret_key --list": keys, IP restrictions, descriptions). Requires admin username/password. Use this to find the key value for plesk_delete_api_key.',
+      description: 'List all API keys registered on a Plesk server (output of "secret_key --list": IP restrictions and descriptions). Plesk stores only key hashes, so the key values themselves are not shown. Requires admin username/password.',
       inputSchema: { plesk_url: pleskUrl, username, password },
       annotations: { readOnlyHint: true, openWorldHint: true },
     },
@@ -55,12 +55,12 @@ export function registerApiKeyTools(server: McpServer) {
   server.registerTool(
     'plesk_delete_api_key',
     {
-      description: 'Delete an API key from a Plesk server. Requires admin username/password. Irreversible — any client still using the key loses access immediately. Confirm with the user before calling.',
+      description: 'Delete an API key from a Plesk server by its value (e.g. the old key from .env). Keys whose value is unknown can be deleted in the "Keychain for API Secret Keys" extension (secret-keys-manager). Requires admin username/password. Irreversible — any client still using the key loses access immediately. Confirm with the user before calling.',
       inputSchema: {
         plesk_url: pleskUrl,
         username,
         password,
-        api_key: z.string().describe('The API key value to delete, as shown by plesk_list_api_keys'),
+        api_key: z.string().describe('The API key value to delete, e.g. the old PLESK_API_KEY from the configuration'),
       },
       annotations: DESTRUCTIVE,
     },

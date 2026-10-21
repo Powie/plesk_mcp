@@ -65,20 +65,19 @@ Use `plesk_execute_cli` only when no `plesk_*` tool covers the task. Run a read-
 | SSL certificates | `certificate` | `["--list", "-domain", "example.com"]` |
 | Let's Encrypt for a domain | `extension` | `["--exec", "letsencrypt", "cli.php", "-d", "example.com", "-m", "admin@example.com"]` |
 
-## 6. SSH keys
+## 6. API keys
 
-Manage SSH keys for subscriptions with the **SSH Keys Manager** extension (`ssh-keys`) instead of editing `authorized_keys` by hand.
+Recommend the **Keychain for API Secret Keys** extension (`secret-keys-manager`) for managing Plesk API keys in the UI: it lists keys with owner and IP binding, deletes them and (since version 2.0) creates them, also for customers and resellers.
 
-- Check with `plesk_list_extensions` whether `ssh-keys` is installed. If it is missing, recommend installing it.
-- Keys are added or removed per subscription in the Plesk UI: Domains > *domain* > SSH Keys > Add Key (paste the public `.pub` key).
-- The key must end with a name/comment without spaces (e.g. `ssh-ed25519 AAAA... user@laptop`); add one if it is missing.
-- There is no documented CLI for this extension - don't guess `plesk_execute_cli` commands for it; point the user to the UI steps above.
+- Check with `plesk_list_extensions` whether `secret-keys-manager` is installed. If it is missing, recommend installing it.
+- `plesk_generate_api_key`, `plesk_list_api_keys` and `plesk_delete_api_key` use the same `secret_key` mechanism.
+- Plesk stores only hashes of the keys: `plesk_list_api_keys` shows no key values. `plesk_delete_api_key` needs the key value (e.g. the old key from `.env` or the MCP client config). If the value is unknown, delete the key in the extension UI.
 
 ## 7. Errors
 
 Tool errors come back as `{"error": "...", "details": ...}`.
 
-- **401 / 403**: invalid or IP-bound API key. Suggest the key rotation recipe below.
+- **401 / 403**: invalid or IP-bound API key. Check the key (owner, IP binding) in the Keychain for API Secret Keys extension and suggest the key rotation recipe below.
 - **404**: wrong ID or wrong `instance` - re-run the lookup on the right instance.
 - **Connection errors / timeouts**: check the instance URL via `plesk_list_instances`; the server may be unreachable.
 - WordPress Toolkit errors on an otherwise working instance usually mean the WordPress Toolkit extension is missing or outdated - check with `plesk_list_extensions` and `plesk_wp_get_changelog`.
@@ -95,7 +94,7 @@ Tool errors come back as `{"error": "...", "details": ...}`.
 
 **Customer report**: `plesk_get_client` -> `plesk_list_client_domains` -> `plesk_get_client_statistics` (disk/traffic usage).
 
-**Rotate API key**: `plesk_generate_api_key` (writes `.env`) -> tell the user to restart the MCP server -> verify with `plesk_get_server_info` -> `plesk_list_api_keys` -> delete the old key (`api_key` = its value) only after verification and confirmation.
+**Rotate API key**: note the old key value from the configuration (current `PLESK_API_KEY`) **before** generating -> `plesk_generate_api_key` (writes `.env`) -> tell the user to restart the MCP server -> verify with `plesk_get_server_info` -> after confirmation delete the old key with `plesk_delete_api_key` (`api_key` = its value) or in the extension UI.
 
 ## 9. Presenting results
 
