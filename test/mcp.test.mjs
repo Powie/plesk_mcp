@@ -10,7 +10,7 @@ const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'plesk-mcp-test-'));
 process.env.PLESK_ENV_FILE = path.join(directory, '.env');
 const { getInstance, loadPleskInstances } = await import('../dist/config.js');
 const { saveApiKeyToEnv } = await import('../dist/auth.js');
-const { registerTools } = await import('../dist/tools.js');
+const { registerTools } = await import('../dist/tools/index.js');
 const one = { name: 'instance_1', url: 'https://one.invalid', apiKey: 'test-one' };
 const two = { name: 'instance_2', url: 'https://two.invalid', apiKey: 'test-two' };
 const instances = new Map([[one.name, one], [two.name, two]]);
@@ -42,7 +42,7 @@ test('saving keys preserves other instances and rejects invalid names', () => {
   assert.throws(() => saveApiKeyToEnv(one.name, one.url, 'key\ninjected'));
 });
 test('MCP lists schemas, routes instances and rejects invalid inputs', async () => {
-  const server = new McpServer({ name: 'test', version: '0.2.0' });
+  const server = new McpServer({ name: 'test', version: '0.11.0' });
   registerTools(server, instances);
   const client = new Client({ name: 'test-client', version: '1' });
   const [a, b] = InMemoryTransport.createLinkedPair();
@@ -50,7 +50,7 @@ test('MCP lists schemas, routes instances and rejects invalid inputs', async () 
   await client.connect(b);
   try {
     const { tools } = await client.listTools();
-    assert.equal(tools.length, 31);
+    assert.equal(tools.length, 35);
     const domain = tools.find(t => t.name === 'plesk_get_domain');
     assert.ok(domain.inputSchema.required.includes('domain_id'));
     const list = await client.callTool({ name: 'plesk_list_instances', arguments: {} });

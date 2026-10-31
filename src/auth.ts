@@ -1,8 +1,7 @@
 import axios from 'axios';
-import https from 'https';
 import fs from 'fs';
-import { envPath } from './config.js';
-
+import { createHttpsAgent, normalizeUrl } from './api-client.js';
+import { ENV_PATH } from './config.js';
 
 /**
  * Generate API key using username/password authentication
@@ -15,9 +14,10 @@ export async function generateApiKey(
 ): Promise<string> {
   try {
     const response = await axios.post(
-      `${pleskUrl}/api/v2/auth/keys`,
+      `${normalizeUrl(pleskUrl)}/api/v2/cli/secret_key/call`,
       {
-        description: description,
+        // /auth/keys defaults to the caller's IP. The CLI omits IP binding.
+        params: ['--create', '-description', description],
       },
       {
         auth: {
@@ -28,13 +28,15 @@ export async function generateApiKey(
           'Content-Type': 'application/json',
         },
         timeout: 30_000,
-        httpsAgent: new https.Agent({
-          rejectUnauthorized: true,
-        }),
+        httpsAgent: createHttpsAgent(),
       }
     );
 
-    return response.data.key || response.data;
+    const result = response.data;
+    if (result?.code !== 0 || typeof result.stdout !== 'string' || !result.stdout.trim()) {
+      throw new Error('Plesk did not return a valid API key from secret_key');
+    }
+    return result.stdout.trim();
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;
@@ -53,12 +55,9 @@ export function saveApiKeyToEnv(
   pleskUrl: string,
   apiKey: string
 ): void {
-  if (!/^(default|instance_[0-9]+)$/.test(instanceName)) {
-    throw new Error('Invalid instance name');
-  }
-  if (new URL(pleskUrl).protocol !== 'https:' || /[\r\n]/.test(pleskUrl + apiKey)) {
-    throw new Error('Invalid URL or API key');
-  }
+  if (!/^(default|instance_[0-9]+)$/.test(instanceName)) throw new Error('Invalid instance name');
+  if (new URL(pleskUrl).protocol !== 'https:' || /[\r\n]/.test(pleskUrl + apiKey)) throw new Error('Invalid URL or API key');
+  const envPath = ENV_PATH;
 
   let envContent = '';
 
@@ -107,29 +106,30 @@ export function saveApiKeyToEnv(
 }
 
 /**
- * List all existing API keys
+ * List all API keys via the secret_key CLI utility.
+ * The REST API has no endpoint for listing keys.
  */
 export async function listApiKeys(
   pleskUrl: string,
   username: string,
   password: string
-): Promise<any[]> {
+): Promise<string> {
   try {
-    const response = await axios.get(
-      `${pleskUrl}/api/v2/auth/keys`,
+    const response = await axios.post(
+      `${normalizeUrl(pleskUrl)}/api/v2/cli/secret_key/call`,
+      { params: ['--list'] },
       {
-        auth: {
-          username: username,
-          password: password,
-        },
+        auth: { username, password },
         timeout: 30_000,
-        httpsAgent: new https.Agent({
-          rejectUnauthorized: true,
-        }),
+        httpsAgent: createHttpsAgent(),
       }
     );
 
-    return response.data;
+    const result = response.data;
+    if (result?.code !== 0) {
+      throw new Error(`secret_key --list failed: ${result?.stderr || result?.stdout || 'unknown error'}`);
+    }
+    return result.stdout;
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;
@@ -141,26 +141,21 @@ export async function listApiKeys(
 }
 
 /**
- * Delete an API key
+ * Delete an API key. The REST API identifies keys by their value.
  */
 export async function deleteApiKey(
   pleskUrl: string,
   username: string,
   password: string,
-  keyId: string
+  apiKey: string
 ): Promise<void> {
   try {
     await axios.delete(
-      `${pleskUrl}/api/v2/auth/keys/${keyId}`,
+      `${normalizeUrl(pleskUrl)}/api/v2/auth/keys/${encodeURIComponent(apiKey)}`,
       {
-        auth: {
-          username: username,
-          password: password,
-        },
+        auth: { username, password },
         timeout: 30_000,
-        httpsAgent: new https.Agent({
-          rejectUnauthorized: true,
-        }),
+        httpsAgent: createHttpsAgent(),
       }
     );
   } catch (error: any) {

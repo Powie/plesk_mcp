@@ -1,16 +1,67 @@
-// Supply credentials through the environment.
-(async () => {
-  const { generateApiKey, saveApiKeyToEnv } = await import('./dist/auth.js');
-  const { PLESK_URL: url, PLESK_USERNAME: username, PLESK_PASSWORD: password } = process.env;
-  if (!url || !username || !password || new URL(url).protocol !== 'https:') {
-    throw new Error('Set PLESK_URL (HTTPS), PLESK_USERNAME and PLESK_PASSWORD.');
+const axios = require('axios');
+const https = require('https');
+const fs = require('fs');
+const path = require('path');
+
+const [,, argUrl, argUsername, argPassword] = process.argv;
+const url = process.env.PLESK_URL || argUrl;
+const username = process.env.PLESK_USERNAME || argUsername;
+const password = process.env.PLESK_PASSWORD || argPassword;
+
+if (!url || !username || !password) {
+  console.error('Usage: node generate-key.cjs <plesk-url> <username> <password>');
+  console.error('Example: node generate-key.cjs https://server.com:8443 root mypassword');
+  process.exit(1);
+}
+
+async function generateApiKey() {
+  try {
+    console.log(`Generiere API-Key für ${url}...`);
+
+    const response = await axios.post(
+      `${url.replace(/\/$/, '')}/api/v2/cli/secret_key/call`,
+      // Omitting -ip-address creates a key usable after a client IP change.
+      { params: ['--create', '-description', 'MCP Server API Key'] },
+      {
+        timeout: 30_000,
+        auth: { username, password },
+        httpsAgent: new https.Agent({ rejectUnauthorized: process.env.PLESK_VERIFY_TLS !== 'false' })
+      }
+    );
+
+    if (response.data?.code !== 0 || typeof response.data.stdout !== 'string' || !response.data.stdout.trim()) {
+      throw new Error('Plesk did not return a valid API key from secret_key');
+    }
+    const apiKey = response.data.stdout.trim();
+    console.log('API-Key erfolgreich generiert!');
+
+    const envPath = process.env.PLESK_ENV_FILE || path.join(__dirname, '.env');
+    let envContent = '';
+    if (fs.existsSync(envPath)) {
+      envContent = fs.readFileSync(envPath, 'utf8');
+    }
+
+    const lines = envContent.split('\n').filter(line => line.trim() !== '');
+    let urlFound = false;
+    let keyFound = false;
+
+    const newLines = lines.map(line => {
+      if (line.startsWith('PLESK_URL=')) { urlFound = true; return `PLESK_URL=${url}`; }
+      if (line.startsWith('PLESK_API_KEY=')) { keyFound = true; return `PLESK_API_KEY=${apiKey}`; }
+      return line;
+    });
+
+    if (!urlFound) newLines.push(`PLESK_URL=${url}`);
+    if (!keyFound) newLines.push(`PLESK_API_KEY=${apiKey}`);
+
+    fs.writeFileSync(envPath, newLines.join('\n') + '\n');
+
+    console.log('API-Key wurde in .env gespeichert.');
+    console.log('Bitte starte Claude Desktop neu, um die neue Konfiguration zu laden.');
+  } catch (error) {
+    console.error('Fehler:', error.response?.data || error.message);
+    process.exit(1);
   }
-  const instance = process.env.PLESK_INSTANCE || 'default';
-  if (!/^(default|instance_[0-9]+)$/.test(instance)) throw new Error('Invalid instance');
-  const key = await generateApiKey(url, username, password);
-  saveApiKeyToEnv(instance, url, key);
-  console.log('API key saved.');
-})().catch(() => {
-  console.error('API key generation failed. Check configuration and server access.');
-  process.exitCode = 1;
-});
+}
+
+generateApiKey();

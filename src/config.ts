@@ -1,11 +1,20 @@
 import dotenv from 'dotenv';
-import { fileURLToPath } from 'node:url';
-
-export const envPath = process.env.PLESK_ENV_FILE || fileURLToPath(new URL('../.env', import.meta.url));
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { PleskInstance } from './types.js';
 
-// Load environment variables
-dotenv.config({ path: envPath, quiet: true });
+/**
+ * Package root directory (one level above dist/)
+ */
+export const PACKAGE_ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+/**
+ * .env file written by plesk_generate_api_key
+ */
+export const ENV_PATH = process.env.PLESK_ENV_FILE || path.join(PACKAGE_ROOT, '.env');
+
+// Use the same file for loading and saving; explicit environment variables take precedence.
+dotenv.config({ path: ENV_PATH, quiet: true });
 
 /**
  * Load all Plesk instances from environment variables
@@ -51,10 +60,6 @@ export function loadPleskInstances(): Map<string, PleskInstance> {
       });
     }
   });
-
-  if (instances.size === 0) {
-    console.error('Warning: No Plesk instances configured. Please check your .env file.');
-  }
 
   return instances;
 }

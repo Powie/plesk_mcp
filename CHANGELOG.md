@@ -1,16 +1,16 @@
 # Changelog
 
-## 0.2.0
+## 0.11.0
 
-- Updated dependencies and added Zod directly.
-- Replaced invalid argument schemas for all 31 MCP tools.
-- Require explicit server selection when multiple instances exist without a default.
-- Allow empty startup and activate generated instances immediately.
-- Use one configuration path for reading and writing; support PLESK_ENV_FILE.
-- Enable TLS verification and 30-second request timeouts.
-- Remove embedded administrator credentials from the helper. Previously exposed credentials require rotation; Git history is unchanged.
-- Validate instance names before persisting configuration.
-- Align package and protocol versions at 0.2.0.
-- Add regression coverage for server selection, configuration and MCP schemas.
+- Merge the current main branch: retain modular tools, corrected Plesk/WP Toolkit payloads, workflow prompts and API key generation without IP binding.
+- Update MCP SDK, Axios, dotenv, Zod, Node types and transitive dependencies. Keep TypeScript 5.9.3 for compatibility with the existing compiler-API tests.
+- Require explicit instance selection with multiple servers and no default.
+- Activate generated instances immediately, including initial setup without configured servers.
+- Use a consistent configuration path with PLESK_ENV_FILE support.
+- Verify TLS certificates by default and set 30-second request timeouts. Custom CAs use NODE_EXTRA_CA_CERTS; PLESK_VERIFY_TLS=false remains an explicit test-only opt-out.
+- Validate instance names and configuration values before saving.
+- Support environment-based credentials in the standalone helper.
+- Update English/German READMEs and installation instructions.
+- Combine regression and end-to-end tests; make the HTTPS mock setup work on Windows.
 
-Validation: build, four local tests and npm audit passed. No live Plesk requests were made. Endpoint compatibility with deployed Plesk and WP Toolkit versions still requires a test server.
+Validation: 55 tests passed against local mocks, build passed, npm audit reported zero vulnerabilities. No production Plesk server was contacted.

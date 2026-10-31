@@ -4,7 +4,7 @@ Diese Anleitung beschreibt, wie Sie den Plesk MCP Server für die Nutzung mit Cl
 
 ## Voraussetzungen
 
-- Node.js (Version 18 oder höher)
+- Node.js (Version 20 oder höher)
 - npm oder yarn
 - Zugang zu einem oder mehreren Plesk-Servern
 - Claude Desktop (für die Nutzung mit Claude)
@@ -23,7 +23,7 @@ Das Projekt wird automatisch heruntergeladen, die Dependencies installiert und T
 
 **Hinweis:** Sie können auch einen spezifischen Branch installieren:
 ```bash
-npm install github:Powie/plesk_mcp#beta
+npm install github:Powie/plesk_mcp#dev
 ```
 
 ### Option B: Lokale Installation (Entwicklung)
@@ -83,8 +83,10 @@ PLESK_2_API_KEY=second-api-key-here
 
 #### Option B: Über Plesk Extension
 
-1. Installieren Sie die Plesk Extension "secret-keys-manager"
-2. Öffnen Sie die Extension und fügen Sie einen neuen API Key hinzu
+1. Installieren Sie die Plesk Extension **Keychain for API Secret Keys** (`secret-keys-manager`)
+2. Öffnen Sie die Extension und fügen Sie einen neuen API Key hinzu (ab Extension-Version 2.0)
+
+Die Extension zeigt außerdem alle vorhandenen Keys mit Besitzer und IP-Bindung an und kann alte Keys löschen.
 
 ## Integration mit Claude Desktop
 
@@ -109,15 +111,23 @@ Fügen Sie den Plesk MCP Server zur Konfiguration hinzu:
       "command": "npx",
       "args": [
         "-y",
-        "github:Powie/plesk_mcp#beta"
+        "github:Powie/plesk_mcp"
       ],
       "env": {
-        "PLESK_1_URL": "https://my.server1.com:8443",
-        "PLESK_1_API_KEY": "total-secret-key"
+        "PLESK_URL": "https://my.server1.com:8443",
+        "PLESK_API_KEY": "total-secret-key"
       }
    }
   }
 }
+```
+
+Weitere Server werden als `PLESK_2_URL`/`PLESK_2_API_KEY` usw. ergänzt. Die TLS-Zertifikatsprüfung ist standardmäßig aktiv.
+
+#### Claude Code
+
+```bash
+claude mcp add plesk -e PLESK_URL=https://my.server1.com:8443 -e PLESK_API_KEY=total-secret-key -- npx -y github:Powie/plesk_mcp
 ```
 
 ### 3. Claude Desktop neu starten
@@ -127,6 +137,8 @@ Starten Sie Claude Desktop komplett neu, damit die Änderungen wirksam werden.
 Fügen Sie den ersten Server hinzu mit folgendem Prompt:
 
 Füge einen neuen Plesk Server hinzu, Servername: https://server.xx:8443 mit Benutzername: user und Passwort: geheimespasswort
+
+Der Server startet auch ohne konfigurierte Instanz, sodass der erste Key so erzeugt werden kann. Der Key wird in die `.env` im Paketverzeichnis geschrieben. Bei Installation über `npx` liegt dieses im npm-Cache und kann bei Updates verloren gehen – übertragen Sie den Key daher in den `env`-Block der Konfiguration.
 
 ### 4. Verbindung testen
 
@@ -171,6 +183,10 @@ Beim Aufruf der Tools können Sie dann die gewünschte Instanz angeben.
 2. Testen Sie die Verbindung im Browser
 3. Prüfen Sie, ob der API-Key noch gültig ist
 4. Stellen Sie sicher, dass der Plesk-Server von Ihrem Netzwerk aus erreichbar ist
+
+### Zertifikatsfehler
+
+Der Plesk-Server benötigt ein gültiges Zertifikat für den Hostnamen in der URL. Eigene CAs werden über NODE_EXTRA_CA_CERTS (PEM-Datei) eingebunden. PLESK_VERIFY_TLS=false deaktiviert die Prüfung ausdrücklich für isolierte Testumgebungen.
 
 ### API-Key funktioniert nicht
 

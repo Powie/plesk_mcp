@@ -22,7 +22,25 @@ MCP Server für die Plesk REST API mit Unterstützung für mehrere Plesk-Instanz
 
 ## Installation
 
-see INSTALL.md
+Voraussetzung ist Node.js 20 oder neuer. Siehe [INSTALL.de.md](INSTALL.de.md).
+
+## Konfiguration
+
+Instanzen werden über `PLESK_URL`/`PLESK_API_KEY` bzw. `PLESK_N_URL`/`PLESK_N_API_KEY` konfiguriert – in der `.env` oder im `env`-Block der MCP-Client-Konfiguration (hat Vorrang).
+
+Die TLS-Zertifikatsprüfung ist standardmäßig aktiv. Eigene Zertifizierungsstellen können über NODE_EXTRA_CA_CERTS eingebunden werden:
+
+```env
+PLESK_VERIFY_TLS=true
+```
+
+## API-Key erzeugen
+
+`plesk_generate_api_key` erzeugt mit Plesk-Admin-Zugangsdaten einen Key ohne IP-Bindung und speichert ihn in der `.env`. Der neue Key steht sofort zur Verfügung. Er bleibt auch bei einem Wechsel der öffentlichen Client-IP nutzbar.
+
+Das MCP-Tool und `generate-key.cjs` verwenden `/api/v2/cli/secret_key/call` mit `--create` und `-description`, ohne `-ip-address`. Voraussetzung ist der Zugriff auf diese CLI-Funktion über die REST-API. Es gibt keinen Rückfall auf `/auth/keys`, da dieser Endpunkt bei fehlendem `ip` die Absender-IP bindet.
+
+Bereits IP-gebundene Keys werden durch das Update nicht verändert. Erzeuge einen Ersatz, starte den MCP-Server neu und prüfe den Zugriff, bevor du den alten Key löschst. Siehe [Plesk secret_key-Dokumentation](https://docs.plesk.com/en-US/obsidian/cli-linux/73880/).
 
 ## MCP Tools
 
@@ -35,17 +53,22 @@ see INSTALL.md
 ### Domain Management
 - `plesk_list_domains` - Liste aller Domains
 - `plesk_get_domain` - Domain-Details abrufen
-- `plesk_create_domain` - Neue Domain erstellen
+- `plesk_create_domain` - Neue Domain erstellen (neues Abonnement oder in bestehendes; Besitzer, Tarif, IPs, FTP-Login)
 - `plesk_update_domain` - Domain aktualisieren
+- `plesk_get_domain_status` - Domain-Status abrufen
+- `plesk_set_domain_status` - Domain aktivieren, sperren oder deaktivieren
 - `plesk_delete_domain` - Domain löschen
 
 ### Client Management
 - `plesk_list_clients` - Liste aller Clients
 - `plesk_get_client` - Client-Details abrufen
+- `plesk_list_client_domains` - Domains eines Clients auflisten
+- `plesk_get_client_statistics` - Ressourcenverbrauch eines Clients
 - `plesk_create_client` - Neuen Client erstellen
 - `plesk_update_client` - Client aktualisieren
 - `plesk_suspend_client` - Client suspendieren
 - `plesk_activate_client` - Client aktivieren
+- `plesk_delete_client` - Client löschen
 
 ### Server Management
 - `plesk_get_server_info` - Server-Informationen
@@ -58,18 +81,40 @@ see INSTALL.md
 - `plesk_execute_cli` - Plesk CLI-Befehl ausführen
 
 ### WordPress Toolkit
-- `plesk_wp_list_installations` - Liste aller WordPress-Installationen
+- `plesk_wp_list_installations` - Liste aller WordPress-Installationen (optional gefiltert)
 - `plesk_wp_get_installation` - Details einer WordPress-Installation
-- `plesk_wp_clone_installation` - WordPress-Installation klonen
+- `plesk_wp_clone_installation` - WordPress-Installation auf bestehende Domain oder neue Subdomain klonen
 - `plesk_wp_create_backup` - Backup erstellen
 - `plesk_wp_restore_backup` - Backup wiederherstellen
 - `plesk_wp_list_backups` - Alle Backups auflisten
 - `plesk_wp_toggle_maintenance` - Wartungsmodus aktivieren/deaktivieren
 - `plesk_wp_clear_cache` - Cache leeren
 - `plesk_wp_get_background_task` - Status eines Background-Tasks abrufen
-- `plesk_wp_list_background_tasks` - Background-Tasks auflisten
 - `plesk_wp_update_vulnerability_filtering` - Vulnerability-Filtering aktivieren/deaktivieren
 - `plesk_wp_get_changelog` - WordPress Toolkit Changelog abrufen
+
+Alle Tools tragen MCP-Annotations (`readOnlyHint`, `destructiveHint`), damit Clients vor destruktiven Aufrufen nachfragen können.
+
+## Skill & Prompts
+
+Damit Claude die Tools effizient und sicher nutzt, liefert das Repository einen Skill und mehrere MCP-Prompts mit.
+
+### Agent Skill (`skills/plesk/SKILL.md`)
+
+Vermittelt Claude die richtige Aufrufreihenfolge (Instanz -> ID nachschlagen -> Aktion -> Background-Task abfragen), welche Operationen eine Bestätigung brauchen, nützliche Plesk-CLI-Aufrufe und fertige Abläufe.
+
+- **Claude Code:** `cp -r skills/plesk ~/.claude/skills/` (oder `.claude/skills/` im Projekt)
+- **Claude Desktop / claude.ai:** Ordner `skills/plesk` zippen und unter Einstellungen > Funktionen > Skills hochladen
+
+### MCP-Prompts
+
+In jedem MCP-Client mit Prompt-Unterstützung verfügbar (z. B. als Slash-Commands):
+
+- `plesk_server_overview` - Überblick über Version, IPs, Extensions, Domains, Kunden und WordPress-Seiten
+- `plesk_wp_safe_maintenance` - Backup -> Wartungsmodus -> Arbeiten -> Cache leeren -> wieder online
+- `plesk_wp_staging_clone` - WordPress-Seite auf eine Staging-Domain klonen
+- `plesk_onboard_customer` - Kunden und erste Domain anlegen
+- `plesk_rotate_api_key` - Neuen API-Key erzeugen, prüfen, alten löschen
 
 ## Usage Examples
 
@@ -114,7 +159,7 @@ Clone WordPress installation with ID 15 to staging.example.com
 Clear cache for WordPress installations 10, 15 and 20
 ```
 
-## Version 0.2.0
+## Version 0.11.0
 
 Ein MCP-Prozess verwaltet alle Plesk-Server. Auch instance_1 wird unterstützt. Bei mehreren Servern ohne default muss jeder Aufruf die Zielinstanz angeben. Eine ausdrücklich angeforderte, fehlende Standardinstanz wird nicht ersetzt.
 
