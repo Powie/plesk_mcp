@@ -55,7 +55,7 @@ Use the plesk_generate_api_key tool with:
 - instance_name: default (or instance_2, etc.)
 ```
 
-The tool automatically generates an API key and saves it in the `.env` file. After restarting the MCP Server, the instance is available.
+The tool automatically generates an API key and saves it in the `.env` file. The instance is immediately available.
 
 ### Manually via Plesk UI
 
@@ -131,3 +131,11 @@ Add to Claude Desktop Config (`claude_desktop_config.json`):
 ```bash
 npm run dev
 ```
+
+## Version 0.2.0
+
+One MCP process manages all Plesk servers, including instance_1. With multiple servers and no default, calls must specify their target instance. An explicitly requested missing default is never silently replaced.
+
+The project .env loads independently of the working directory. PLESK_ENV_FILE selects another persistent path, including for npx installations. The server starts without configured instances; generated instances are immediately available.
+
+TLS certificates are verified. Set NODE_EXTRA_CA_CERTS to a custom CA PEM file at process startup if needed. API requests time out after 30 seconds.

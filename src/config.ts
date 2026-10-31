@@ -1,8 +1,11 @@
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'node:url';
+
+export const envPath = process.env.PLESK_ENV_FILE || fileURLToPath(new URL('../.env', import.meta.url));
 import { PleskInstance } from './types.js';
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ path: envPath, quiet: true });
 
 /**
  * Load all Plesk instances from environment variables
@@ -18,7 +21,7 @@ export function loadPleskInstances(): Map<string, PleskInstance> {
   if (defaultUrl && defaultApiKey) {
     instances.set('default', {
       name: 'default',
-      url: defaultUrl,
+      url: defaultUrl.replace(/\/+$/, ''),
       apiKey: defaultApiKey,
     });
   }
@@ -43,7 +46,7 @@ export function loadPleskInstances(): Map<string, PleskInstance> {
     if (url && apiKey) {
       instances.set(`instance_${num}`, {
         name: `instance_${num}`,
-        url: url,
+        url: url.replace(/\/+$/, ''),
         apiKey: apiKey,
       });
     }
@@ -62,7 +65,10 @@ export function loadPleskInstances(): Map<string, PleskInstance> {
 export function getInstance(instances: Map<string, PleskInstance>, name?: string): PleskInstance {
   if (!name || name === 'default') {
     const defaultInstance = instances.get('default');
-    if (!defaultInstance && instances.size > 0) {
+    if (!defaultInstance && instances.size > 1) {
+      throw new Error(`Specify an instance. Available: ${Array.from(instances.keys()).join(', ')}`);
+    }
+    if (!defaultInstance && instances.size === 1 && !name) {
       // Return first available instance if no default
       const firstInstance = instances.values().next().value;
       if (!firstInstance) {

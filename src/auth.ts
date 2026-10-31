@@ -1,11 +1,8 @@
 import axios from 'axios';
 import https from 'https';
 import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { envPath } from './config.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 /**
  * Generate API key using username/password authentication
@@ -30,8 +27,9 @@ export async function generateApiKey(
         headers: {
           'Content-Type': 'application/json',
         },
+        timeout: 30_000,
         httpsAgent: new https.Agent({
-          rejectUnauthorized: false,
+          rejectUnauthorized: true,
         }),
       }
     );
@@ -55,7 +53,12 @@ export function saveApiKeyToEnv(
   pleskUrl: string,
   apiKey: string
 ): void {
-  const envPath = path.join(__dirname, '..', '.env');
+  if (!/^(default|instance_[0-9]+)$/.test(instanceName)) {
+    throw new Error('Invalid instance name');
+  }
+  if (new URL(pleskUrl).protocol !== 'https:' || /[\r\n]/.test(pleskUrl + apiKey)) {
+    throw new Error('Invalid URL or API key');
+  }
 
   let envContent = '';
 
@@ -85,7 +88,7 @@ export function saveApiKeyToEnv(
 
   if (urlRegex.test(envContent)) {
     // Update existing URL
-    envContent = envContent.replace(urlRegex, `${urlVar}=${pleskUrl}`);
+    envContent = envContent.replace(urlRegex, () => `${urlVar}=${pleskUrl}`);
   } else {
     // Add new URL
     envContent += `\n${urlVar}=${pleskUrl}`;
@@ -93,7 +96,7 @@ export function saveApiKeyToEnv(
 
   if (keyRegex.test(envContent)) {
     // Update existing API key
-    envContent = envContent.replace(keyRegex, `${keyVar}=${apiKey}`);
+    envContent = envContent.replace(keyRegex, () => `${keyVar}=${apiKey}`);
   } else {
     // Add new API key
     envContent += `\n${keyVar}=${apiKey}`;
@@ -119,8 +122,9 @@ export async function listApiKeys(
           username: username,
           password: password,
         },
+        timeout: 30_000,
         httpsAgent: new https.Agent({
-          rejectUnauthorized: false,
+          rejectUnauthorized: true,
         }),
       }
     );
@@ -153,8 +157,9 @@ export async function deleteApiKey(
           username: username,
           password: password,
         },
+        timeout: 30_000,
         httpsAgent: new https.Agent({
-          rejectUnauthorized: false,
+          rejectUnauthorized: true,
         }),
       }
     );

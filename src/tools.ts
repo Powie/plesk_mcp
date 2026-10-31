@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { PleskClient } from './plesk-client.js';
 import { WordPressClient } from './wordpress-client.js';
@@ -56,11 +57,7 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_get_server_info',
     'Get Plesk server information',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
     },
     async (args: any) => {
       const client = getClient(args.instance);
@@ -84,11 +81,7 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_list_ips',
     'List all IP addresses on the Plesk server',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
     },
     async (args: any) => {
       const client = getClient(args.instance);
@@ -112,11 +105,7 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_list_domains',
     'List all domains on the Plesk server',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
     },
     async (args: any) => {
       const client = getClient(args.instance);
@@ -140,16 +129,8 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_get_domain',
     'Get details of a specific domain',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      domain_id: {
-        type: 'number',
-        description: 'Domain ID',
-        required: true,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      domain_id: z.number().int().positive().describe('Domain ID'),
     },
     async (args: any) => {
       const client = getClient(args.instance);
@@ -173,26 +154,10 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_create_domain',
     'Create a new domain on the Plesk server',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      name: {
-        type: 'string',
-        description: 'Domain name',
-        required: true,
-      },
-      ip_address_id: {
-        type: 'number',
-        description: 'IP address ID',
-        required: false,
-      },
-      hosting_type: {
-        type: 'string',
-        description: 'Hosting type (virtual, standard, etc.)',
-        required: false,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      name: z.string().describe('Domain name'),
+      ip_address_id: z.number().int().positive().describe('IP address ID').optional(),
+      hosting_type: z.string().describe('Hosting type (virtual, standard, etc.)').optional(),
     },
     async (args: any) => {
       const client = getClient(args.instance);
@@ -227,21 +192,9 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_update_domain',
     'Update a domain',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      domain_id: {
-        type: 'number',
-        description: 'Domain ID',
-        required: true,
-      },
-      name: {
-        type: 'string',
-        description: 'New domain name',
-        required: false,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      domain_id: z.number().int().positive().describe('Domain ID'),
+      name: z.string().describe('New domain name').optional(),
     },
     async (args: any) => {
       const client = getClient(args.instance);
@@ -271,16 +224,8 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_delete_domain',
     'Delete a domain from the Plesk server',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      domain_id: {
-        type: 'number',
-        description: 'Domain ID',
-        required: true,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      domain_id: z.number().int().positive().describe('Domain ID'),
     },
     async (args: any) => {
       const client = getClient(args.instance);
@@ -304,11 +249,7 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_list_clients',
     'List all clients on the Plesk server',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
     },
     async (args: any) => {
       const client = getClient(args.instance);
@@ -332,16 +273,8 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_get_client',
     'Get details of a specific client',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      client_id: {
-        type: 'number',
-        description: 'Client ID',
-        required: true,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      client_id: z.number().int().positive().describe('Client ID'),
     },
     async (args: any) => {
       const client = getClient(args.instance);
@@ -365,41 +298,13 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_create_client',
     'Create a new client account',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      type: {
-        type: 'string',
-        description: 'Client type (customer, reseller)',
-        required: true,
-      },
-      name: {
-        type: 'string',
-        description: 'Client name',
-        required: true,
-      },
-      email: {
-        type: 'string',
-        description: 'Email address',
-        required: true,
-      },
-      login: {
-        type: 'string',
-        description: 'Login username',
-        required: true,
-      },
-      password: {
-        type: 'string',
-        description: 'Password',
-        required: true,
-      },
-      company: {
-        type: 'string',
-        description: 'Company name',
-        required: false,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      type: z.string().describe('Client type (customer, reseller)'),
+      name: z.string().describe('Client name'),
+      email: z.string().describe('Email address'),
+      login: z.string().describe('Login username'),
+      password: z.string().describe('Password'),
+      company: z.string().describe('Company name').optional(),
     },
     async (args: any) => {
       const client = getClient(args.instance);
@@ -435,31 +340,11 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_update_client',
     'Update a client account',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      client_id: {
-        type: 'number',
-        description: 'Client ID',
-        required: true,
-      },
-      name: {
-        type: 'string',
-        description: 'New name',
-        required: false,
-      },
-      email: {
-        type: 'string',
-        description: 'New email',
-        required: false,
-      },
-      company: {
-        type: 'string',
-        description: 'New company name',
-        required: false,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      client_id: z.number().int().positive().describe('Client ID'),
+      name: z.string().describe('New name').optional(),
+      email: z.string().describe('New email').optional(),
+      company: z.string().describe('New company name').optional(),
     },
     async (args: any) => {
       const client = getClient(args.instance);
@@ -489,16 +374,8 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_suspend_client',
     'Suspend a client account',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      client_id: {
-        type: 'number',
-        description: 'Client ID',
-        required: true,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      client_id: z.number().int().positive().describe('Client ID'),
     },
     async (args: any) => {
       const client = getClient(args.instance);
@@ -522,16 +399,8 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_activate_client',
     'Activate a client account',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      client_id: {
-        type: 'number',
-        description: 'Client ID',
-        required: true,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      client_id: z.number().int().positive().describe('Client ID'),
     },
     async (args: any) => {
       const client = getClient(args.instance);
@@ -555,11 +424,7 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_list_extensions',
     'List all installed extensions',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
     },
     async (args: any) => {
       const client = getClient(args.instance);
@@ -583,21 +448,9 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_execute_cli',
     'Execute a Plesk CLI command',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      command: {
-        type: 'string',
-        description: 'CLI command ID',
-        required: true,
-      },
-      params: {
-        type: 'array',
-        description: 'Command parameters',
-        required: false,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      command: z.string().regex(/^[a-zA-Z0-9_-]+$/).describe('CLI command ID'),
+      params: z.array(z.string()).describe('Command parameters').optional(),
     },
     async (args: any) => {
       const client = getClient(args.instance);
@@ -625,31 +478,11 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_generate_api_key',
     'Generate a new API key for a Plesk instance using username/password and save it to .env',
     {
-      plesk_url: {
-        type: 'string',
-        description: 'Plesk server URL (e.g., https://your-server.com:8443)',
-        required: true,
-      },
-      username: {
-        type: 'string',
-        description: 'Plesk admin username',
-        required: true,
-      },
-      password: {
-        type: 'string',
-        description: 'Plesk admin password',
-        required: true,
-      },
-      instance_name: {
-        type: 'string',
-        description: 'Instance name to save in .env (default, instance_2, etc.)',
-        required: false,
-      },
-      description: {
-        type: 'string',
-        description: 'Description for the API key',
-        required: false,
-      },
+      plesk_url: z.url().refine(value => new URL(value).protocol === "https:", "HTTPS is required").describe('Plesk server URL (e.g., https://your-server.com:8443)'),
+      username: z.string().describe('Plesk admin username'),
+      password: z.string().describe('Plesk admin password'),
+      instance_name: z.string().regex(/^(default|instance_[0-9]+)$/).describe('Instance name to save in .env (default, instance_2, etc.)').optional(),
+      description: z.string().describe('Description for the API key').optional(),
     },
     async (args: any) => {
       try {
@@ -666,6 +499,7 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
 
         // Save to .env
         saveApiKeyToEnv(instanceName, args.plesk_url, apiKey);
+        instances.set(instanceName, { name: instanceName, url: args.plesk_url.replace(/\/+$/, ""), apiKey });
 
         return {
           content: [
@@ -676,7 +510,7 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
                 message: `API key generated and saved to .env for instance "${instanceName}"`,
                 instance: instanceName,
                 url: args.plesk_url,
-                note: 'Please restart the MCP server to load the new configuration',
+                note: 'The instance is available immediately',
               }, null, 2),
             },
           ],
@@ -705,21 +539,9 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_list_api_keys',
     'List all API keys for a Plesk instance',
     {
-      plesk_url: {
-        type: 'string',
-        description: 'Plesk server URL',
-        required: true,
-      },
-      username: {
-        type: 'string',
-        description: 'Plesk admin username',
-        required: true,
-      },
-      password: {
-        type: 'string',
-        description: 'Plesk admin password',
-        required: true,
-      },
+      plesk_url: z.url().refine(value => new URL(value).protocol === "https:", "HTTPS is required").describe('Plesk server URL'),
+      username: z.string().describe('Plesk admin username'),
+      password: z.string().describe('Plesk admin password'),
     },
     async (args: any) => {
       try {
@@ -761,26 +583,10 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_delete_api_key',
     'Delete an API key from a Plesk instance',
     {
-      plesk_url: {
-        type: 'string',
-        description: 'Plesk server URL',
-        required: true,
-      },
-      username: {
-        type: 'string',
-        description: 'Plesk admin username',
-        required: true,
-      },
-      password: {
-        type: 'string',
-        description: 'Plesk admin password',
-        required: true,
-      },
-      key_id: {
-        type: 'string',
-        description: 'API key ID to delete',
-        required: true,
-      },
+      plesk_url: z.url().refine(value => new URL(value).protocol === "https:", "HTTPS is required").describe('Plesk server URL'),
+      username: z.string().describe('Plesk admin username'),
+      password: z.string().describe('Plesk admin password'),
+      key_id: z.string().describe('API key ID to delete'),
     },
     async (args: any) => {
       try {
@@ -830,16 +636,8 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_wp_list_installations',
     'List all WordPress installations on the Plesk server',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      filter: {
-        type: 'string',
-        description: 'Filter installations by title, URL, or other criteria',
-        required: false,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      filter: z.string().describe('Filter installations by title, URL, or other criteria').optional(),
     },
     async (args: any) => {
       const client = getWPClient(args.instance);
@@ -864,16 +662,8 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_wp_get_installation',
     'Get details of a specific WordPress installation',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      installation_id: {
-        type: 'number',
-        description: 'WordPress installation ID',
-        required: true,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      installation_id: z.number().int().positive().describe('WordPress installation ID'),
     },
     async (args: any) => {
       const client = getWPClient(args.instance);
@@ -897,26 +687,10 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_wp_clone_installation',
     'Clone a WordPress installation to a new location',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      installation_id: {
-        type: 'number',
-        description: 'WordPress installation ID to clone',
-        required: true,
-      },
-      target_domain: {
-        type: 'string',
-        description: 'Target domain for the clone',
-        required: false,
-      },
-      target_path: {
-        type: 'string',
-        description: 'Target path for the clone',
-        required: false,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      installation_id: z.number().int().positive().describe('WordPress installation ID to clone'),
+      target_domain: z.string().describe('Target domain for the clone').optional(),
+      target_path: z.string().describe('Target path for the clone').optional(),
     },
     async (args: any) => {
       const client = getWPClient(args.instance);
@@ -947,21 +721,9 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_wp_create_backup',
     'Create a backup of a WordPress installation',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      installation_id: {
-        type: 'number',
-        description: 'WordPress installation ID',
-        required: true,
-      },
-      description: {
-        type: 'string',
-        description: 'Backup description',
-        required: false,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      installation_id: z.number().int().positive().describe('WordPress installation ID'),
+      description: z.string().describe('Backup description').optional(),
     },
     async (args: any) => {
       const client = getWPClient(args.instance);
@@ -990,21 +752,9 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_wp_restore_backup',
     'Restore a WordPress installation from backup',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      installation_id: {
-        type: 'number',
-        description: 'WordPress installation ID',
-        required: true,
-      },
-      backup_id: {
-        type: 'string',
-        description: 'Backup ID to restore',
-        required: true,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      installation_id: z.number().int().positive().describe('WordPress installation ID'),
+      backup_id: z.string().describe('Backup ID to restore'),
     },
     async (args: any) => {
       const client = getWPClient(args.instance);
@@ -1033,16 +783,8 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_wp_list_backups',
     'List all backups for a WordPress installation',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      installation_id: {
-        type: 'number',
-        description: 'WordPress installation ID',
-        required: true,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      installation_id: z.number().int().positive().describe('WordPress installation ID'),
     },
     async (args: any) => {
       const client = getWPClient(args.instance);
@@ -1066,21 +808,9 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_wp_toggle_maintenance',
     'Enable or disable maintenance mode for a WordPress installation',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      installation_id: {
-        type: 'number',
-        description: 'WordPress installation ID',
-        required: true,
-      },
-      enabled: {
-        type: 'boolean',
-        description: 'Enable (true) or disable (false) maintenance mode',
-        required: true,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      installation_id: z.number().int().positive().describe('WordPress installation ID'),
+      enabled: z.boolean().describe('Enable (true) or disable (false) maintenance mode'),
     },
     async (args: any) => {
       const client = getWPClient(args.instance);
@@ -1107,16 +837,8 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_wp_clear_cache',
     'Clear cache for one or more WordPress installations',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      installation_ids: {
-        type: 'array',
-        description: 'Array of WordPress installation IDs',
-        required: true,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      installation_ids: z.array(z.number().int().positive()).min(1).describe('Array of WordPress installation IDs'),
     },
     async (args: any) => {
       const client = getWPClient(args.instance);
@@ -1142,21 +864,9 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_wp_get_background_task',
     'Get information about a background task execution',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      task_code: {
-        type: 'string',
-        description: 'Task code (e.g., "backup", "clone")',
-        required: true,
-      },
-      task_id: {
-        type: 'string',
-        description: 'Task ID',
-        required: true,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      task_code: z.string().describe('Task code (e.g., "backup", "clone")'),
+      task_id: z.string().describe('Task ID'),
     },
     async (args: any) => {
       const client = getWPClient(args.instance);
@@ -1180,16 +890,8 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_wp_list_background_tasks',
     'List all background tasks for a WordPress installation',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      installation_id: {
-        type: 'number',
-        description: 'WordPress installation ID',
-        required: true,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      installation_id: z.number().int().positive().describe('WordPress installation ID'),
     },
     async (args: any) => {
       const client = getWPClient(args.instance);
@@ -1213,21 +915,9 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_wp_update_vulnerability_filtering',
     'Enable or disable vulnerability filtering for a WordPress installation',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
-      installation_id: {
-        type: 'number',
-        description: 'WordPress installation ID',
-        required: true,
-      },
-      filtering_enabled: {
-        type: 'boolean',
-        description: 'Enable (true) or disable (false) vulnerability filtering',
-        required: true,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
+      installation_id: z.number().int().positive().describe('WordPress installation ID'),
+      filtering_enabled: z.boolean().describe('Enable (true) or disable (false) vulnerability filtering'),
     },
     async (args: any) => {
       const client = getWPClient(args.instance);
@@ -1254,11 +944,7 @@ export function registerTools(server: McpServer, instances: Map<string, PleskIns
     'plesk_wp_get_changelog',
     'Get WordPress Toolkit product changelog in markdown format',
     {
-      instance: {
-        type: 'string',
-        description: 'Plesk instance name (default: "default")',
-        required: false,
-      },
+      instance: z.string().describe('Plesk instance name (default: "default")').optional(),
     },
     async (args: any) => {
       const client = getWPClient(args.instance);

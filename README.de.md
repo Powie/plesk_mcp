@@ -113,3 +113,11 @@ Clone WordPress installation with ID 15 to staging.example.com
 ```
 Clear cache for WordPress installations 10, 15 and 20
 ```
+
+## Version 0.2.0
+
+Ein MCP-Prozess verwaltet alle Plesk-Server. Auch instance_1 wird unterstützt. Bei mehreren Servern ohne default muss jeder Aufruf die Zielinstanz angeben. Eine ausdrücklich angeforderte, fehlende Standardinstanz wird nicht ersetzt.
+
+Die .env wird unabhängig vom Arbeitsverzeichnis aus dem Projekt geladen. PLESK_ENV_FILE erlaubt einen anderen, dauerhaften Pfad, etwa für npx. Der Server startet auch ohne konfigurierte Instanzen; per Tool erzeugte Instanzen sind sofort nutzbar.
+
+TLS-Zertifikate werden geprüft. Für eigene Zertifizierungsstellen NODE_EXTRA_CA_CERTS beim Prozessstart auf deren PEM-Datei setzen. API-Anfragen haben ein Zeitlimit von 30 Sekunden.

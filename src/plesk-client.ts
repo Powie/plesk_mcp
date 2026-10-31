@@ -20,9 +20,10 @@ export class PleskClient {
         'X-API-Key': instance.apiKey,
         'Content-Type': 'application/json',
       },
-      // Allow self-signed certificates (for test environments)
-      httpsAgent: new https.Agent({
-        rejectUnauthorized: false,
+      // Verify certificates; custom CAs can use NODE_EXTRA_CA_CERTS.
+      timeout: 30_000,
+        httpsAgent: new https.Agent({
+        rejectUnauthorized: true,
       }),
     });
   }

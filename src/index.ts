@@ -12,11 +12,6 @@ async function main() {
   // Load Plesk instances from environment
   const instances = loadPleskInstances();
 
-  if (instances.size === 0) {
-    console.error('Error: No Plesk instances configured.');
-    console.error('Please create a .env file with PLESK_URL and PLESK_API_KEY');
-    process.exit(1);
-  }
 
   console.error(`Loaded ${instances.size} Plesk instance(s):`);
   instances.forEach((instance) => {
@@ -26,7 +21,7 @@ async function main() {
   // Create MCP server
   const server = new McpServer({
     name: 'plesk',
-    version: '1.0.0',
+    version: '0.2.0',
   });
 
   // Register all tools
